@@ -1,0 +1,19 @@
+name: Keep Supabase Alive
+
+# 3일마다 자동 실행 (7일 제한 방지)
+on:
+  schedule:
+    - cron: '0 0 */3 * *'  # 매 3일마다 UTC 00:00
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Supabase Database
+        run: |
+          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/projects?select=count" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          echo "Supabase pinged successfully at $(date)"
