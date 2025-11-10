@@ -104,7 +104,7 @@ export const skills: Skill[] = [
   // Backend & Database
   {
     name: 'Supabase',
-    icon: 'javascript',
+    icon: 'supabase',
     color: '#3ECF8E',
     tooltip: 'Backend as a Service (PostgreSQL)',
     category: 'Backend'
@@ -136,14 +136,14 @@ export const skills: Skill[] = [
   // Deployment
   {
     name: 'Vercel',
-    icon: 'nextjs',
+    icon: 'vercel',
     color: '#000000',
     tooltip: '프론트엔드 배포 플랫폼',
     category: 'Deployment'
   },
   {
     name: 'AWS',
-    icon: 'javascript',
+    icon: 'amazonwebservices',
     color: '#FF9900',
     tooltip: '클라우드 컴퓨팅 플랫폼',
     category: 'Deployment'
@@ -152,14 +152,14 @@ export const skills: Skill[] = [
   // Collaboration
   {
     name: 'Jira',
-    icon: 'javascript',
+    icon: 'jiraalign',
     color: '#0052CC',
     tooltip: '애자일 프로젝트 관리 도구',
     category: 'Collaboration'
   },
   {
     name: 'Confluence',
-    icon: 'javascript',
+    icon: 'confluence',
     color: '#172B4D',
     tooltip: '팀 협업 & 문서화 플랫폼',
     category: 'Collaboration'
