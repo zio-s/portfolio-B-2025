@@ -265,15 +265,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-              {/* Featured Badge - Over image */}
-              {project.featured && (
-                <div className="absolute top-6 left-6 z-10">
-                  <Badge variant="default" size="sm" className="shadow-lg">
-                    Featured
-                  </Badge>
-                </div>
-              )}
             </div>
 
             {/* Content */}

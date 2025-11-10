@@ -59,7 +59,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       hover
       className={cn(
         'group cursor-pointer overflow-hidden h-full relative',
-        featured && 'ring-1 ring-accent/30',
         className
       )}
       onClick={handleCardClick}
@@ -71,15 +70,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-
-        {/* Featured Badge - Always visible */}
-        {featured && (
-          <div className="absolute top-4 right-4 z-10">
-            <Badge variant="default" size="sm">
-              Featured
-            </Badge>
-          </div>
-        )}
 
         {/* Dark Overlay - appears on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

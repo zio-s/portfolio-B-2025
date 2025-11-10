@@ -22,19 +22,15 @@ const CATEGORIES: Array<{ value: ProjectCategory | undefined; label: string }> =
   { value: undefined, label: '전체' },
   { value: 'web', label: 'Web' },
   { value: 'mobile', label: 'Mobile' },
-  { value: 'backend', label: 'Backend' },
-  { value: 'fullstack', label: 'Fullstack' },
 ];
 
 export const ProjectsPage = () => {
   const [category, setCategory] = useState<ProjectCategory | undefined>();
-  const [featured, setFeatured] = useState<boolean | undefined>();
   const [page, setPage] = useState(1);
 
   // RTK Query로 프로젝트 목록 조회
   const { data, isLoading, error } = useGetProjectsQuery({
     category,
-    featured,
     page,
     limit: 6,
   });
@@ -42,11 +38,6 @@ export const ProjectsPage = () => {
   // 필터 변경 시 페이지 초기화
   const handleCategoryChange = (newCategory: ProjectCategory | undefined) => {
     setCategory(newCategory);
-    setPage(1);
-  };
-
-  const handleFeaturedToggle = () => {
-    setFeatured((prev) => (prev === true ? undefined : true));
     setPage(1);
   };
 
@@ -95,21 +86,6 @@ export const ProjectsPage = () => {
                 </button>
               </Tooltip>
             ))}
-
-            <div className="w-px h-6 bg-border ml-2" />
-
-            <Tooltip content="추천 프로젝트만 보기" position={CATEGORIES.length % 2 === 0 ? 'top' : 'bottom'}>
-              <button
-                onClick={handleFeaturedToggle}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  featured
-                    ? 'bg-accent text-white'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-card'
-                }`}
-              >
-                Featured
-              </button>
-            </Tooltip>
           </div>
         </Container>
       </Section>
@@ -190,7 +166,6 @@ export const ProjectsPage = () => {
                 variant="outline"
                 onClick={() => {
                   setCategory(undefined);
-                  setFeatured(undefined);
                   setPage(1);
                 }}
               >
