@@ -14,7 +14,7 @@ export interface Skill {
   icon: string;
   color: string;
   tooltip: string;
-  category: 'Frontend' | 'Styling' | 'State & API' | 'Animation' | 'Tools';
+  category: 'Frontend' | 'Styling' | 'State & API' | 'Backend' | 'Animation' | 'Deployment' | 'Collaboration' | 'Tools';
 }
 
 export const skills: Skill[] = [
@@ -41,10 +41,10 @@ export const skills: Skill[] = [
     category: 'Frontend'
   },
   {
-    name: 'Vue.js',
-    icon: 'vuejs',
-    color: '#4FC08D',
-    tooltip: '프로그레시브 JavaScript 프레임워크',
+    name: 'JavaScript',
+    icon: 'javascript',
+    color: '#F7DF1E',
+    tooltip: '동적 프로그래밍 언어',
     category: 'Frontend'
   },
 
@@ -57,33 +57,40 @@ export const skills: Skill[] = [
     category: 'Styling'
   },
   {
-    name: 'Sass',
+    name: 'SCSS',
     icon: 'sass',
     color: '#CC6699',
-    tooltip: 'CSS 전처리기',
+    tooltip: 'CSS 전처리기 (Sass)',
     category: 'Styling'
   },
   {
     name: 'CSS3',
     icon: 'css3',
     color: '#1572B6',
-    tooltip: 'CSS-in-JS 및 스타일링',
+    tooltip: '모던 CSS 스타일링',
+    category: 'Styling'
+  },
+  {
+    name: 'Styled Components',
+    icon: 'react',
+    color: '#DB7093',
+    tooltip: 'CSS-in-JS 라이브러리',
     category: 'Styling'
   },
 
   // State Management & API
   {
-    name: 'Redux',
+    name: 'Redux Toolkit',
     icon: 'redux',
     color: '#764ABC',
     tooltip: '예측 가능한 상태 컨테이너',
     category: 'State & API'
   },
   {
-    name: 'React Query',
-    icon: 'react',
-    color: '#FF4154',
-    tooltip: '서버 상태 관리 라이브러리',
+    name: 'RTK Query',
+    icon: 'redux',
+    color: '#764ABC',
+    tooltip: '서버 상태 관리 & 캐싱',
     category: 'State & API'
   },
   {
@@ -92,6 +99,15 @@ export const skills: Skill[] = [
     color: '#5A29E4',
     tooltip: 'Promise 기반 HTTP 클라이언트',
     category: 'State & API'
+  },
+
+  // Backend & Database
+  {
+    name: 'Supabase',
+    icon: 'javascript',
+    color: '#3ECF8E',
+    tooltip: 'Backend as a Service (PostgreSQL)',
+    category: 'Backend'
   },
 
   // Animation
@@ -108,6 +124,45 @@ export const skills: Skill[] = [
     color: '#0055FF',
     tooltip: 'React용 프로덕션 레디 모션 라이브러리',
     category: 'Animation'
+  },
+  {
+    name: 'Swiper',
+    icon: 'javascript',
+    color: '#6332F6',
+    tooltip: '터치 슬라이더 라이브러리',
+    category: 'Animation'
+  },
+
+  // Deployment
+  {
+    name: 'Vercel',
+    icon: 'nextjs',
+    color: '#000000',
+    tooltip: '프론트엔드 배포 플랫폼',
+    category: 'Deployment'
+  },
+  {
+    name: 'AWS',
+    icon: 'javascript',
+    color: '#FF9900',
+    tooltip: '클라우드 컴퓨팅 플랫폼',
+    category: 'Deployment'
+  },
+
+  // Collaboration
+  {
+    name: 'Jira',
+    icon: 'javascript',
+    color: '#0052CC',
+    tooltip: '애자일 프로젝트 관리 도구',
+    category: 'Collaboration'
+  },
+  {
+    name: 'Confluence',
+    icon: 'javascript',
+    color: '#172B4D',
+    tooltip: '팀 협업 & 문서화 플랫폼',
+    category: 'Collaboration'
   },
 
   // Tools

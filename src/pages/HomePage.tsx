@@ -35,7 +35,6 @@ import SassOriginal from 'devicons-react/lib/icons/SassOriginal';
 import TailwindcssOriginal from 'devicons-react/lib/icons/TailwindcssOriginal';
 import TypescriptOriginal from 'devicons-react/lib/icons/TypescriptOriginal';
 import ViteOriginal from 'devicons-react/lib/icons/ViteOriginal';
-import VuejsOriginal from 'devicons-react/lib/icons/VuejsOriginal';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -58,7 +57,6 @@ const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
   tailwindcss: TailwindcssOriginal,
   typescript: TypescriptOriginal,
   vite: ViteOriginal,
-  vuejs: VuejsOriginal,
 };
 
 const HomePage = () => {
