@@ -118,8 +118,18 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
     document.body.style.width = '100%';
     document.body.style.paddingRight = `${scrollbarWidth}px`;
 
-    // Prevent touch scroll on mobile
+    // Prevent touch scroll on mobile background, but allow scroll inside modal
     const preventScroll = (e: TouchEvent) => {
+      // Allow scroll if touch is inside a scrollable element
+      const target = e.target as HTMLElement;
+      const scrollableElement = target.closest('.overflow-y-auto');
+
+      // If touch is inside scrollable modal content, allow it
+      if (scrollableElement) {
+        return;
+      }
+
+      // Otherwise, prevent scroll on backdrop/background
       e.preventDefault();
     };
     document.body.addEventListener('touchmove', preventScroll, { passive: false });
