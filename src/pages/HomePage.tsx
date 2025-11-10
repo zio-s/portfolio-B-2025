@@ -40,12 +40,18 @@ import TailwindcssOriginal from 'devicons-react/lib/icons/TailwindcssOriginal';
 import TypescriptOriginal from 'devicons-react/lib/icons/TypescriptOriginal';
 import VercelOriginal from 'devicons-react/lib/icons/VercelOriginal';
 import ViteOriginal from 'devicons-react/lib/icons/ViteOriginal';
+import GsapIcon from '@/assets/icons/gsap.svg?react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// SVG 컴포넌트 래퍼 (size prop 지원)
+const GsapIconWrapper: React.FC<{ size?: string }> = ({ size = '40' }) => (
+  <GsapIcon width={size} height={size} />
+);
 
 // 정적 아이콘 매핑 (Tree-shaking 최적화)
 const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
@@ -56,7 +62,7 @@ const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
   figma: FigmaOriginal,
   framermotion: FramermotionOriginal,
   git: GitOriginal,
-  gsap: JavascriptOriginal, // GSAP 전용 아이콘 없음
+  gsap: GsapIconWrapper,
   javascript: JavascriptOriginal,
   jiraalign: JiraalignOriginal,
   nextjs: NextjsOriginal,
