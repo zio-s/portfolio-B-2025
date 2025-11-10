@@ -242,7 +242,7 @@ const HomePage = () => {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-lg bg-card hover:bg-accent/10 transition-colors border border-border"
+                  className="p-3 rounded-lg bg-card flex hover:bg-accent/10 transition-colors border border-border"
                   whileHover={{ y: 3 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label={label}
