@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Github, Linkedin, Mail, ArrowRight } from 'lucide-react';
+import { Github, MessageCircle, Mail, ArrowRight } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -165,7 +165,7 @@ const HomePage = () => {
 
         {/* Hero Content */}
         <motion.div
-          className="relative z-10 max-w-6xl mx-auto px-8 text-center"
+          className="relative z-10 max-w-6xl mx-auto px-8 text-center sm:-mt-10 -mt-30"
         >
           <motion.h1
             initial={{ opacity: 0, scale: 0.9 }}
@@ -223,29 +223,30 @@ const HomePage = () => {
             className="flex gap-4 justify-center"
           >
             {[
-              { icon: Github, href: 'https://github.com', label: 'GitHub' },
-              { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-              { icon: Mail, href: 'mailto:contact@bsm.dev', label: 'Email' }
+              { icon: Github, href: 'https://github.com/zio-s', label: '깃허브' },
+              { icon: MessageCircle, href: 'https://open.kakao.com/o/sAtkrp1h', label: '오픈카톡' },
+              { icon: Mail, href: 'mailto:zio.s.dev@gmail.com', label: '메일' }
             ].map(({ icon: Icon, href, label }) => (
-              <motion.a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3 rounded-lg bg-card hover:bg-accent/10 transition-colors border border-border"
-                whileHover={{ scale: 1.1, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label={label}
-              >
-                <Icon className="w-5 h-5" />
-              </motion.a>
+              <Tooltip key={label} content={label} position="top">
+                <motion.a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3 rounded-lg bg-card hover:bg-accent/10 transition-colors border border-border"
+                  whileHover={{ y: 3 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={label}
+                >
+                  <Icon className="w-5 h-5" />
+                </motion.a>
+              </Tooltip>
             ))}
           </motion.div>
         </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-30 left-1/2 -translate-x-1/2 "
+          className="absolute bottom-28 sm:bottom-28 left-1/2 -translate-x-1/2 "
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
@@ -351,11 +352,11 @@ const HomePage = () => {
           </div>
 
           {projectsData && projectsData.items.length > 0 && (
-            <div className="relative px-16">
+            <div className="relative px-4 sm:px-16">
               <Swiper
                 modules={[Navigation]}
-                spaceBetween={24}
-                slidesPerView={1.2}
+                spaceBetween={16}
+                slidesPerView={1}
                 centeredSlides={false}
                 navigation={{
                   nextEl: '.swiper-button-next-custom',

@@ -123,7 +123,7 @@ const GuestbookPage = () => {
         description="여러분의 소중한 의견을 남겨주세요. 프론트엔드 개발자 변세민의 포트폴리오 방문록입니다."
         url="https://semincode.com/guestbook"
       />
-      <div className="w-full sm:px-6 max-w-[1400px] mx-auto py-12">
+      <div className="w-full px-4 sm:px-6 max-w-[1400px] mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Left Column - Header & List */}
           <div className="flex-1 order-2 lg:order-1">
