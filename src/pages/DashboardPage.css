@@ -1,0 +1,131 @@
+/**
+ * DashboardPage Responsive Styles
+ *
+ * 반응형 디자인:
+ * - Desktop (> 1024px): 4 columns
+ * - Tablet (769px - 1024px): 2 columns
+ * - Mobile (<= 768px): 1 column
+ */
+
+/* ========================================
+   Container
+   ======================================== */
+
+.dashboard-container {
+  padding: var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Stats Grid
+   ======================================== */
+
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* ========================================
+   Quick Actions Grid
+   ======================================== */
+
+.dashboard-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* ========================================
+   User Cards Grid
+   ======================================== */
+
+.dashboard-user-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* ========================================
+   Tablet (769px - 1024px)
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: var(--spacing-xl);
+  }
+
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-user-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========================================
+   Mobile (<= 768px)
+   ======================================== */
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: var(--spacing-md);
+  }
+
+  /* Stats Grid - 1 column */
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  /* Quick Actions - 1 column */
+  .dashboard-actions-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  /* User Cards - 1 column */
+  .dashboard-user-cards-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  /* Header 텍스트 크기 축소 */
+  .dashboard-header-title {
+    font-size: var(--font-size-2xl) !important;
+  }
+
+  .dashboard-header-subtitle {
+    font-size: var(--font-size-base) !important;
+  }
+
+  /* Section Title 크기 축소 */
+  .dashboard-section-title {
+    font-size: var(--font-size-lg) !important;
+  }
+}
+
+/* ========================================
+   Small Mobile (<= 480px)
+   ======================================== */
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: var(--spacing-sm);
+  }
+
+  .dashboard-stats-grid,
+  .dashboard-actions-grid,
+  .dashboard-user-cards-grid {
+    gap: var(--spacing-xs);
+  }
+}

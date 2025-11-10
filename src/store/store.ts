@@ -1,0 +1,62 @@
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice';
+import postsReducer from './slices/postsSlice';
+import usersReducer from './slices/usersSlice';
+import uiReducer from './slices/uiSlice';
+import recentMenuReducer from './slices/recentMenuSlice';
+import { projectsApi } from '../features/portfolio/api/projectsApi';
+import { commentsApi } from '../features/comments/api/commentsApi';
+import { adminApi } from '../features/admin/api/adminApi';
+import { guestbookApi } from '../features/guestbook/api/guestbookApi';
+
+// Configure Store
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    posts: postsReducer,
+    users: usersReducer,
+    ui: uiReducer,
+    recentMenu: recentMenuReducer,
+    // RTK Query APIs
+    [projectsApi.reducerPath]: projectsApi.reducer,
+    [commentsApi.reducerPath]: commentsApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
+    [guestbookApi.reducerPath]: guestbookApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types for serializable check
+        ignoredActions: ['ui/addNotification'],
+        // Ignore these paths in the state
+        ignoredPaths: ['ui.notifications'],
+      },
+      // immutableCheck 경고 임계값 증가 (개발 모드 성능 개선)
+      immutableCheck: {
+        warnAfter: 128, // 기본값 32ms → 128ms로 증가
+      },
+    })
+      .concat(projectsApi.middleware)
+      .concat(commentsApi.middleware)
+      .concat(adminApi.middleware)
+      .concat(guestbookApi.middleware),
+  devTools: import.meta.env.MODE !== 'production',
+});
+
+// Infer types from store
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+// Initialize theme on app start
+const initializeTheme = () => {
+  const theme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+};
+
+initializeTheme();
+
+export default store;
