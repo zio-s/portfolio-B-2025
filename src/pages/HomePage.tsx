@@ -40,18 +40,13 @@ import TailwindcssOriginal from 'devicons-react/lib/icons/TailwindcssOriginal';
 import TypescriptOriginal from 'devicons-react/lib/icons/TypescriptOriginal';
 import VercelOriginal from 'devicons-react/lib/icons/VercelOriginal';
 import ViteOriginal from 'devicons-react/lib/icons/ViteOriginal';
-import GsapIcon from '@/assets/icons/gsap.svg?react';
+import { GsapIcon } from '@/components/icons/GsapIcon';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
 gsap.registerPlugin(ScrollTrigger);
-
-// SVG 컴포넌트 래퍼 (size prop 지원)
-const GsapIconWrapper: React.FC<{ size?: string }> = ({ size = '40' }) => (
-  <GsapIcon width={size} height={size} />
-);
 
 // 정적 아이콘 매핑 (Tree-shaking 최적화)
 const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
@@ -62,7 +57,7 @@ const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
   figma: FigmaOriginal,
   framermotion: FramermotionOriginal,
   git: GitOriginal,
-  gsap: GsapIconWrapper,
+  gsap: GsapIcon,
   javascript: JavascriptOriginal,
   jiraalign: JiraalignOriginal,
   nextjs: NextjsOriginal,
@@ -300,10 +295,11 @@ const HomePage = () => {
             {Object.entries(groupedSkills).map(([category, categorySkills]) => {
               const categoryDescriptions: Record<string, string> = {
                 'Frontend': 'React와 TypeScript를 중심으로 컴포넌트 기반 아키텍처를 설계하고, 사용자 중심의 인터페이스를 구현합니다.',
-                'Styling': 'Tailwind CSS로 빠른 프로토타이핑을, Sass로 복잡한 스타일 시스템을 효율적으로 관리합니다.',
-                'State & API': '전역 상태 관리부터 서버 데이터 동기화까지, 안정적인 데이터 흐름을 설계합니다.',
+                'Styling': 'Tailwind CSS와 SCSS로 확장 가능한 스타일 시스템을 구축합니다.',
+                'State': 'Redux Toolkit과 RTK Query로 전역 상태와 서버 데이터를 효율적으로 관리합니다.',
+                'Backend': 'Supabase로 빠른 백엔드 개발과 실시간 데이터 동기화를 구현합니다.',
                 'Animation': 'GSAP과 Framer Motion으로 사용자의 시선을 사로잡는 인터랙티브한 경험을 만듭니다.',
-                'Tools': 'Git으로 협업하고, Vite로 빌드하며, Figma로 디자인 시스템을 구체화합니다.'
+                'Tools': 'Git, Vite, Vercel을 활용한 효율적인 개발 및 배포 워크플로우를 구축합니다.'
               };
 
               return (
@@ -316,30 +312,30 @@ const HomePage = () => {
                   <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
                     {categoryDescriptions[category]}
                   </p>
-                  <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-4">
+                  <div className="grid grid-cols-3 xs:grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-3">
                     {categorySkills.map((skill) => {
                       const IconComponent = iconMap[skill.icon];
                       return (
                         <Tooltip key={skill.name} position="bottom" content={skill.tooltip}>
                           <motion.div
-                            className="skill-badge cursor-pointer flex flex-col items-center gap-2 p-2 rounded-lg border border-transparent hover:border-accent/50 transition-colors"
+                            className="skill-badge cursor-pointer flex justify-center items-center flex-col text-center p-2 rounded-lg border border-transparent hover:border-accent/50 transition-colors"
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                           >
-                            <div className="w-10 h-10 flex items-center justify-center">
+                            <div className="w-8 h-8 flex items-center justify-center">
                               {IconComponent ? (
-                                <IconComponent size="40" />
+                                <IconComponent size="32" />
                               ) : (
                                 <div
-                                  className="w-10 h-10 rounded flex items-center justify-center text-xs font-bold"
+                                  className="w-8 h-8 rounded flex items-center justify-center text-center leading-8 text-xs font-bold"
                                   style={{ backgroundColor: skill.color, color: 'white' }}
                                 >
                                   {skill.name.substring(0, 2)}
                                 </div>
                               )}
                             </div>
-                            <span className="text-[10px] text-muted-foreground text-center leading-tight">
+                            <span className="text-[10px] text-muted-foreground leading-tight flex items-center justify-center py-2">
                               {skill.name}
                             </span>
                           </motion.div>
