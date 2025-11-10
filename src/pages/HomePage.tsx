@@ -22,18 +22,23 @@ import { useGetProjectsQuery } from '../features/portfolio/api/projectsApi';
 import { ROUTES } from '../router/routes';
 import { skills, type Skill } from '@/data/skills';
 // 개별 아이콘 직접 import (Tree-shaking 지원)
+import AmazonwebservicesOriginalWordmark from 'devicons-react/lib/icons/AmazonwebservicesOriginalWordmark';
 import AxiosPlain from 'devicons-react/lib/icons/AxiosPlain';
+import ConfluenceOriginal from 'devicons-react/lib/icons/ConfluenceOriginal';
 import Css3Original from 'devicons-react/lib/icons/Css3Original';
 import FigmaOriginal from 'devicons-react/lib/icons/FigmaOriginal';
 import FramermotionOriginal from 'devicons-react/lib/icons/FramermotionOriginal';
 import GitOriginal from 'devicons-react/lib/icons/GitOriginal';
 import JavascriptOriginal from 'devicons-react/lib/icons/JavascriptOriginal';
+import JiraalignOriginal from 'devicons-react/lib/icons/JiraalignOriginal';
 import NextjsOriginal from 'devicons-react/lib/icons/NextjsOriginal';
 import ReactOriginal from 'devicons-react/lib/icons/ReactOriginal';
 import ReduxOriginal from 'devicons-react/lib/icons/ReduxOriginal';
 import SassOriginal from 'devicons-react/lib/icons/SassOriginal';
+import SupabaseOriginal from 'devicons-react/lib/icons/SupabaseOriginal';
 import TailwindcssOriginal from 'devicons-react/lib/icons/TailwindcssOriginal';
 import TypescriptOriginal from 'devicons-react/lib/icons/TypescriptOriginal';
+import VercelOriginal from 'devicons-react/lib/icons/VercelOriginal';
 import ViteOriginal from 'devicons-react/lib/icons/ViteOriginal';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -44,18 +49,24 @@ gsap.registerPlugin(ScrollTrigger);
 
 // 정적 아이콘 매핑 (Tree-shaking 최적화)
 const iconMap: Record<string, React.ComponentType<{ size?: string }>> = {
+  amazonwebservices: AmazonwebservicesOriginalWordmark,
   axios: AxiosPlain,
+  confluence: ConfluenceOriginal,
   css3: Css3Original,
   figma: FigmaOriginal,
   framermotion: FramermotionOriginal,
   git: GitOriginal,
+  gsap: JavascriptOriginal, // GSAP 전용 아이콘 없음
   javascript: JavascriptOriginal,
+  jiraalign: JiraalignOriginal,
   nextjs: NextjsOriginal,
   react: ReactOriginal,
   redux: ReduxOriginal,
   sass: SassOriginal,
+  supabase: SupabaseOriginal,
   tailwindcss: TailwindcssOriginal,
   typescript: TypescriptOriginal,
+  vercel: VercelOriginal,
   vite: ViteOriginal,
 };
 
