@@ -158,9 +158,9 @@ export const ProjectsPage = () => {
         <Section className="py-20">
           <Container>
             <div className="flex flex-col items-center justify-center text-center max-w-md mx-auto">
-              <p className="text-xl font-semibold mb-2">No projects found</p>
+              <p className="text-xl font-semibold mb-2">프로젝트가 없습니다</p>
               <p className="text-muted-foreground mb-6">
-                Try adjusting your filters to see more projects
+                필터를 변경해보세요
               </p>
               <Button
                 variant="outline"
@@ -169,7 +169,7 @@ export const ProjectsPage = () => {
                   setPage(1);
                 }}
               >
-                Clear Filters
+                필터 초기화
               </Button>
             </div>
           </Container>
