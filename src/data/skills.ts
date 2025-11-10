@@ -113,7 +113,7 @@ export const skills: Skill[] = [
   // Animation
   {
     name: 'GSAP',
-    icon: 'javascript',
+    icon: 'gsap',
     color: '#88CE02',
     tooltip: '강력한 웹 애니메이션 라이브러리',
     category: 'Animation'
