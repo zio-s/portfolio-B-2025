@@ -5,6 +5,7 @@
  * 좋아요, 댓글, 조회수 통계를 포함합니다.
  */
 
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
@@ -47,7 +48,10 @@ const PostsPage = () => {
     status: isAdmin ? undefined : 'published',
   });
   const [deletePostMutation] = useDeletePostMutation();
-  const [toggleLike] = useToggleLikeMutation();
+  const [toggleLike, { isLoading: isLikeLoading }] = useToggleLikeMutation();
+
+  // 좋아요 처리 중 플래그 (추가 보호)
+  const [isLikeProcessing, setIsLikeProcessing] = useState(false);
 
   // 게시글 삭제 핸들러
   const handleDelete = async (id: string, title: string) => {
@@ -72,10 +76,18 @@ const PostsPage = () => {
   // 좋아요 토글 핸들러
   const handleLike = async (e: React.MouseEvent, postId: string) => {
     e.stopPropagation();
+    if (isLikeLoading || isLikeProcessing) return;
+
+    setIsLikeProcessing(true);
     try {
       await toggleLike(postId).unwrap();
     } catch {
       console.error('좋아요 처리 실패');
+    } finally {
+      // 500ms 후 다시 클릭 가능
+      setTimeout(() => {
+        setIsLikeProcessing(false);
+      }, 500);
     }
   };
 
@@ -276,11 +288,12 @@ const PostsPage = () => {
                       {/* Like Button */}
                       <button
                         onClick={(e) => handleLike(e, post.id)}
+                        disabled={isLikeLoading || isLikeProcessing}
                         className={`flex items-center gap-1.5 text-sm transition-colors ${
                           post.is_liked
                             ? 'text-red-500 hover:text-red-600'
                             : 'text-muted-foreground hover:text-red-500'
-                        }`}
+                        } ${(isLikeLoading || isLikeProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <Heart
                           className={`w-4 h-4 transition-all ${

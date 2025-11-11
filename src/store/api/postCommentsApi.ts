@@ -132,7 +132,7 @@ export const postCommentsApi = createApi({
     // ========================================
 
     /**
-     * 댓글 생성 (자동으로 pending 상태로 생성)
+     * 댓글 생성 (자동으로 approved 상태로 생성)
      */
     createPostComment: builder.mutation<PostComment, Partial<PostComment>>({
       query: (comment) => buildSupabaseQuery.insert('post_comments', {
@@ -141,7 +141,7 @@ export const postCommentsApi = createApi({
         author_email: comment.author_email || comment.authorEmail,
         content: comment.content,
         parent_id: comment.parent_id || comment.parentId || null,
-        status: 'pending', // 기본적으로 승인 대기 상태
+        status: 'approved', // 모든 댓글 자동 승인
       }),
       invalidatesTags: (_result, _error, comment) => [
         { type: 'PostComment', id: `POST_${comment.post_id || comment.postId}` },
