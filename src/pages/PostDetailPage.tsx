@@ -5,7 +5,7 @@
  * 조회수 자동 증가, 좋아요, 댓글 기능을 포함합니다.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -58,8 +58,11 @@ const PostDetailPage = () => {
     skip: !id,
   });
   const [deletePostMutation] = useDeletePostMutation();
-  const [toggleLike] = useToggleLikeMutation();
+  const [toggleLike, { isLoading: isLikeLoading }] = useToggleLikeMutation();
   const [incrementView] = useIncrementViewMutation();
+
+  // 좋아요 처리 중 플래그 (추가 보호)
+  const [isLikeProcessing, setIsLikeProcessing] = useState(false);
 
   // 조회수 자동 증가 (페이지 진입 시 1회만)
   useEffect(() => {
@@ -96,11 +99,18 @@ const PostDetailPage = () => {
 
   // 좋아요 토글
   const handleLike = async () => {
-    if (!id) return;
+    if (!id || isLikeLoading || isLikeProcessing) return;
+
+    setIsLikeProcessing(true);
     try {
       await toggleLike(id).unwrap();
     } catch {
       console.error('좋아요 처리 실패');
+    } finally {
+      // 500ms 후 다시 클릭 가능
+      setTimeout(() => {
+        setIsLikeProcessing(false);
+      }, 500);
     }
   };
 
@@ -364,11 +374,12 @@ const PostDetailPage = () => {
                   variant="outline"
                   size="lg"
                   onClick={handleLike}
+                  disabled={isLikeLoading || isLikeProcessing}
                   className={`gap-2 transition-all ${
                     post.is_liked
                       ? 'text-red-500 border-red-500/50 hover:bg-red-50 dark:hover:bg-red-950'
                       : 'hover:text-red-500 hover:border-red-500/50'
-                  }`}
+                  } ${(isLikeLoading || isLikeProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <Heart
                     className={`w-5 h-5 transition-all ${
