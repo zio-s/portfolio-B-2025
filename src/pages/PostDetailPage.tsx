@@ -7,6 +7,10 @@
 
 import { useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
   useAppDispatch,
@@ -17,6 +21,21 @@ import {
   selectPostsLoading,
   selectPostsError,
 } from '../store';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Container } from '@/components/ui/container';
+import { Section } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { SEO } from '@/components/common/SEO';
+import {
+  ArrowLeft,
+  Calendar,
+  Edit,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  Clock
+} from 'lucide-react';
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,17 +80,17 @@ const PostDetailPage = () => {
     });
   };
 
-  // 상태 뱃지 색상
-  const getStatusColor = (status: string) => {
+  // 상태 뱃지 스타일
+  const getStatusStyle = (status: string) => {
     switch (status) {
       case 'published':
-        return '#2ecc71';
+        return 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20';
       case 'draft':
-        return '#95a5a6';
+        return 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20';
       case 'archived':
-        return '#e74c3c';
+        return 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20';
       default:
-        return '#3498db';
+        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
     }
   };
 
@@ -92,221 +111,233 @@ const PostDetailPage = () => {
   // 로딩 상태
   if (loading) {
     return (
-      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ color: '#666', fontSize: '1.1rem' }}>게시글을 불러오는 중...</p>
-      </div>
+      <MainLayout>
+        <Section className="py-20">
+          <Container>
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-accent mb-4" />
+              <p className="text-muted-foreground">게시글을 불러오는 중...</p>
+            </div>
+          </Container>
+        </Section>
+      </MainLayout>
     );
   }
 
   // 에러 상태
   if (error) {
     return (
-      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{
-          padding: '1rem',
-          backgroundColor: '#fee',
-          border: '1px solid #fcc',
-          borderRadius: '4px',
-          color: '#c33',
-          marginBottom: '1rem',
-        }}>
-          ⚠️ {error}
-        </div>
-        <Link
-          to={ROUTES.POSTS}
-          style={{
-            color: '#3498db',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          ← 목록으로 돌아가기
-        </Link>
-      </div>
+      <MainLayout>
+        <Section className="py-20">
+          <Container>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="p-6 rounded-xl bg-destructive/10 border border-destructive/30 mb-6">
+                <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
+                <p className="font-medium text-destructive mb-1 text-center">오류가 발생했습니다</p>
+                <p className="text-sm text-muted-foreground text-center">{error}</p>
+              </div>
+              <Link to={ROUTES.POSTS}>
+                <Button variant="outline" className="w-full">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  목록으로 돌아가기
+                </Button>
+              </Link>
+            </motion.div>
+          </Container>
+        </Section>
+      </MainLayout>
     );
   }
 
   // 게시글이 없는 경우
   if (!post) {
     return (
-      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ color: '#999', fontSize: '1.1rem', marginBottom: '1rem' }}>
-          게시글을 찾을 수 없습니다
-        </p>
-        <Link
-          to={ROUTES.POSTS}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: '#3498db',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontWeight: 'bold',
-          }}
-        >
-          목록으로 돌아가기
-        </Link>
-      </div>
+      <MainLayout>
+        <Section className="py-20">
+          <Container>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-20 max-w-md mx-auto"
+            >
+              <div className="w-24 h-24 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-12 h-12 text-accent" />
+              </div>
+              <h2 className="text-2xl font-bold mb-3">게시글을 찾을 수 없습니다</h2>
+              <p className="text-muted-foreground mb-8">삭제되었거나 존재하지 않는 게시글입니다</p>
+              <Link to={ROUTES.POSTS}>
+                <Button size="lg">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  목록으로 돌아가기
+                </Button>
+              </Link>
+            </motion.div>
+          </Container>
+        </Section>
+      </MainLayout>
     );
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      {/* 뒤로가기 버튼 */}
-      <div style={{ marginBottom: '2rem' }}>
-        <Link
-          to={ROUTES.POSTS}
-          style={{
-            color: '#3498db',
-            textDecoration: 'none',
-            fontSize: '0.95rem',
-            fontWeight: '500',
-          }}
-        >
-          ← 목록으로 돌아가기
-        </Link>
-      </div>
+    <MainLayout>
+      <SEO
+        title={`${post.title} | Blog`}
+        description={post.excerpt}
+      />
 
-      {/* 게시글 내용 */}
-      <article style={{
-        backgroundColor: 'white',
-        padding: '2.5rem',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      }}>
-        {/* 제목과 상태 */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-          <h1 style={{ margin: 0, flex: 1, fontSize: '2rem' }}>{post.title}</h1>
-          <span
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: getStatusColor(post.status),
-              color: 'white',
-              borderRadius: '16px',
-              fontSize: '0.85rem',
-              fontWeight: 'bold',
-              marginLeft: '1rem',
-            }}
-          >
-            {getStatusText(post.status)}
-          </span>
-        </div>
-
-        {/* 메타 정보 */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1.5rem',
-          paddingBottom: '1.5rem',
-          marginBottom: '2rem',
-          borderBottom: '2px solid #eee',
-          fontSize: '0.9rem',
-          color: '#666',
-        }}>
-          <span>
-            {post.status === 'published' && post.publishedAt
-              ? `📅 발행일: ${formatDate(post.publishedAt)}`
-              : `📝 작성일: ${formatDate(post.createdAt)}`}
-          </span>
-          {post.updatedAt !== post.createdAt && (
-            <span>✏️ 수정일: {formatDate(post.updatedAt)}</span>
-          )}
-        </div>
-
-        {/* 발췌 */}
-        {post.excerpt && (
-          <div style={{
-            padding: '1rem 1.5rem',
-            backgroundColor: '#f8f9fa',
-            borderLeft: '4px solid #3498db',
-            marginBottom: '2rem',
-            borderRadius: '4px',
-          }}>
-            <p style={{ margin: 0, color: '#555', fontStyle: 'italic', lineHeight: '1.6' }}>
-              {post.excerpt}
-            </p>
-          </div>
-        )}
-
-        {/* 본문 */}
-        <div style={{
-          lineHeight: '1.8',
-          fontSize: '1.05rem',
-          marginBottom: '2rem',
-          whiteSpace: 'pre-wrap',
-          color: '#333',
-        }}>
-          {post.content}
-        </div>
-
-        {/* 태그 */}
-        {post.tags.length > 0 && (
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.5rem',
-            paddingTop: '1.5rem',
-            borderTop: '1px solid #eee',
-            marginBottom: '1.5rem',
-          }}>
-            {post.tags.map((tag, index) => (
-              <span
-                key={index}
-                style={{
-                  padding: '0.375rem 0.75rem',
-                  backgroundColor: '#e8f4f8',
-                  color: '#2c3e50',
-                  borderRadius: '16px',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                }}
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* 버튼 */}
-        <div style={{
-          display: 'flex',
-          gap: '0.75rem',
-          paddingTop: '1.5rem',
-          borderTop: '2px solid #eee',
-        }}>
-          <Link
-            to={routeHelpers.postEdit(post.id)}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#f39c12',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              fontWeight: 'bold',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            }}
-          >
-            ✏️ 수정
+      {/* Back Button */}
+      <Section className="pt-8 pb-4">
+        <Container>
+          <Link to={ROUTES.POSTS}>
+            <Button variant="ghost" className="group -ml-2">
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              목록으로 돌아가기
+            </Button>
           </Link>
+        </Container>
+      </Section>
 
-          <button
-            onClick={handleDelete}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#e74c3c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            }}
+      {/* Article */}
+      <Section className="py-8">
+        <Container>
+          <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl mx-auto"
           >
-            🗑️ 삭제
-          </button>
-        </div>
-      </article>
-    </div>
+            {/* Header */}
+            <header className="mb-12">
+              {/* Title & Status */}
+              <div className="flex flex-col gap-4 mb-8">
+                <div className="flex items-start justify-between gap-4">
+                  <h1 className="text-4xl md:text-5xl font-bold leading-tight flex-1">
+                    {post.title}
+                  </h1>
+                  <Badge
+                    variant="outline"
+                    className={`${getStatusStyle(post.status)} px-3 py-1.5 text-xs font-semibold border shrink-0`}
+                  >
+                    {getStatusText(post.status)}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground pb-8 border-b border-border">
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  {post.status === 'published' && post.publishedAt
+                    ? `발행일: ${formatDate(post.publishedAt)}`
+                    : `작성일: ${formatDate(post.createdAt)}`}
+                </div>
+                {post.updatedAt !== post.createdAt && (
+                  <div className="flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    수정일: {formatDate(post.updatedAt)}
+                  </div>
+                )}
+              </div>
+
+              {/* Excerpt */}
+              {post.excerpt && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="mt-8 p-6 bg-accent/5 dark:bg-accent/10 border-l-4 border-accent rounded-r-lg"
+                >
+                  <p className="text-lg text-muted-foreground italic leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                </motion.div>
+              )}
+            </header>
+
+            {/* Content - Markdown Rendered */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="prose prose-lg dark:prose-invert max-w-none mb-12
+                prose-headings:font-bold prose-headings:tracking-tight
+                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12
+                prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-10
+                prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-8
+                prose-p:leading-relaxed prose-p:mb-4
+                prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+                prose-code:text-accent prose-code:bg-accent/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-[''] prose-code:after:content-['']
+                prose-pre:bg-card prose-pre:border prose-pre:border-border prose-pre:shadow-lg
+                prose-blockquote:border-l-accent prose-blockquote:bg-accent/5 prose-blockquote:py-1
+                prose-ul:my-4 prose-ol:my-4
+                prose-li:my-2
+                prose-img:rounded-xl prose-img:shadow-lg
+                prose-hr:border-border prose-hr:my-12
+                prose-table:border-collapse prose-table:border prose-table:border-border
+                prose-th:bg-accent/10 prose-th:border prose-th:border-border prose-th:p-3
+                prose-td:border prose-td:border-border prose-td:p-3"
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+              >
+                {post.content}
+              </ReactMarkdown>
+            </motion.div>
+
+            {/* Tags */}
+            {post.tags.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="pt-8 border-t border-border mb-8"
+              >
+                <h3 className="text-sm font-semibold text-muted-foreground mb-4">태그</h3>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-medium hover:bg-accent/20 transition-colors"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="flex gap-3 pt-8 border-t border-border"
+            >
+              <Link to={routeHelpers.postEdit(post.id)} className="flex-1">
+                <Button variant="outline" className="w-full group">
+                  <Edit className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                  수정
+                </Button>
+              </Link>
+
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+                className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 group"
+              >
+                <Trash2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                삭제
+              </Button>
+            </motion.div>
+          </motion.article>
+        </Container>
+      </Section>
+    </MainLayout>
   );
 };
 
