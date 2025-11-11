@@ -53,7 +53,7 @@ export const baseQueryWithReauth: typeof baseQuery = async (args, api, extraOpti
 
   // 401 Unauthorized 에러 처리
   if (result.error && result.error.status === 401) {
-    console.warn('401 Unauthorized - 로그인이 필요합니다');
+    // Error handled silently
   }
 
   return result;

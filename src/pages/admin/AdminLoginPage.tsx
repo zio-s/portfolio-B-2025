@@ -49,9 +49,8 @@ export const AdminLoginPage = () => {
     try {
       await dispatch(login(formData)).unwrap();
       // useEffect가 isAuthenticated 변경을 감지하여 자동 리다이렉트
-    } catch (err) {
+    } catch {
       // 에러는 Redux state에서 처리
-      console.error('Login failed:', err);
     }
   };
 

@@ -197,8 +197,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
         const likedProjects = JSON.parse(localStorage.getItem('likedProjects') || '[]');
         localStorage.setItem('likedProjects', JSON.stringify([...likedProjects, projectId]));
       }
-    } catch (error) {
-      console.error('Failed to toggle like:', error);
+    } catch {
+      // Error handled silently
     }
   };
 

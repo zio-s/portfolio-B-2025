@@ -94,8 +94,8 @@ export const Header = ({
       await dispatch(logout()).unwrap();
       // Admin 모드: /admin/login으로, Public 모드: 홈으로
       navigate(mode === 'admin' ? '/admin/login' : '/');
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
+    } catch {
+      // Error handled silently
     }
     setIsProfileOpen(false);
   };

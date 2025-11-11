@@ -69,7 +69,6 @@ export const GuestbookCard: React.FC<GuestbookCardProps> = ({
       });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Failed to toggle pin:', error);
       showAlert({
         title: '고정 실패',
         message: error?.data?.message || '고정 상태 변경에 실패했습니다.',
@@ -117,7 +116,6 @@ export const GuestbookCard: React.FC<GuestbookCardProps> = ({
       });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Failed to add admin reply:', error);
       showAlert({
         title: '답글 작성 실패',
         message: error?.data?.message || '답글 작성에 실패했습니다.',

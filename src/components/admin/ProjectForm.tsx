@@ -175,8 +175,7 @@ export const ProjectForm = ({ project, onSubmit, onCancel, isOpen }: ProjectForm
       };
 
       await onSubmit(submitData);
-    } catch (err) {
-      console.error('Failed to submit form:', err);
+    } catch {
       // Error handling is done by parent component
     } finally {
       setLoading(false);

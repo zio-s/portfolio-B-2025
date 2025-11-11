@@ -56,8 +56,8 @@ const loadInitialState = (): RecentMenuItem[] => {
       const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
       return items.filter(item => item.timestamp > sevenDaysAgo);
     }
-  } catch (error) {
-    console.error('Failed to load recent menu from localStorage:', error);
+  } catch {
+    // Error handled silently
   }
   return [];
 };
@@ -68,8 +68,8 @@ const loadInitialState = (): RecentMenuItem[] => {
 const saveToStorage = (items: RecentMenuItem[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch (error) {
-    console.error('Failed to save recent menu to localStorage:', error);
+  } catch {
+    // Error handled silently
   }
 };
 

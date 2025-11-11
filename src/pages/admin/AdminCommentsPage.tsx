@@ -36,13 +36,12 @@ export const AdminCommentsPage = () => {
             message: '댓글이 삭제되었습니다.',
             type: 'success',
           });
-        } catch (err) {
+        } catch {
           showAlert({
             title: '삭제 실패',
             message: '댓글 삭제에 실패했습니다.',
             type: 'error',
           });
-          console.error(err);
         }
       },
     });

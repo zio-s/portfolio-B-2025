@@ -114,7 +114,6 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
       }
       setCommentText('');
     } catch (error: unknown) {
-      console.error('Failed to create comment:', error);
       let errorMessage = '댓글 작성에 실패했습니다.';
       if (error && typeof error === 'object') {
         if ('data' in error && typeof (error as { data?: { message?: string } }).data === 'object' && (error as { data?: { message?: string } }).data?.message) {
@@ -197,7 +196,6 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
       setReplyText('');
       setReplyingTo(null);
     } catch (error: unknown) {
-      console.error('Failed to create reply:', error);
       let errorMessage = '답글 작성에 실패했습니다.';
       if (error && typeof error === 'object') {
         if ('data' in error && typeof (error as { data?: { message?: string } }).data === 'object' && (error as { data?: { message?: string } }).data?.message) {

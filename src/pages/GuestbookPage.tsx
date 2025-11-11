@@ -47,8 +47,8 @@ const GuestbookPage = () => {
         .then(() => {
           localStorage.setItem(VISIT_KEY, today);
         })
-        .catch((error) => {
-          console.error('Failed to increment visitor count:', error);
+        .catch(() => {
+          // Error handled silently
         });
     }
   }, [incrementVisitorCount]);

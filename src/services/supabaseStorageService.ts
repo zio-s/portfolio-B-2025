@@ -53,8 +53,7 @@ export const uploadToSupabase = async (
       path: data.path,
       type: folder === 'videos' ? 'video' : 'image',
     };
-  } catch (error) {
-    console.error('Supabase upload failed:', error);
+  } catch {
     throw new Error('파일 업로드에 실패했습니다.');
   }
 };

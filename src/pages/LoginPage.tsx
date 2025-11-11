@@ -25,9 +25,8 @@ const LoginPage = () => {
     try {
       await dispatch(login({ email, password })).unwrap();
       navigate(ROUTES.DASHBOARD);
-    } catch (err) {
+    } catch {
       // 에러는 Redux store에서 관리됨
-      console.error('Login failed:', err);
     }
   };
 

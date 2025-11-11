@@ -35,8 +35,7 @@ export function useLocalStorage<T>(
     try {
       const item = window.localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
-    } catch (error) {
-      console.error(`localStorage에서 키 "${key}"를 읽는 중 오류 발생:`, error);
+    } catch {
       return initialValue;
     }
   });
@@ -53,8 +52,8 @@ export function useLocalStorage<T>(
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
-      } catch (error) {
-        console.error(`localStorage에 키 "${key}"를 저장하는 중 오류 발생:`, error);
+      } catch {
+        // Error handled silently
       }
     },
     [key, storedValue]
@@ -67,8 +66,8 @@ export function useLocalStorage<T>(
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
       }
-    } catch (error) {
-      console.error(`localStorage에서 키 "${key}"를 제거하는 중 오류 발생:`, error);
+    } catch {
+      // Error handled silently
     }
   }, [key, initialValue]);
 
@@ -78,8 +77,8 @@ export function useLocalStorage<T>(
       if (e.key === key && e.newValue) {
         try {
           setStoredValue(JSON.parse(e.newValue) as T);
-        } catch (error) {
-          console.error(`storage 이벤트 처리 중 오류 발생:`, error);
+        } catch {
+          // Error handled silently
         }
       }
     };

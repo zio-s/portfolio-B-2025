@@ -67,9 +67,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    * 에러 정보를 로깅
    */
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // 에러 정보 로깅
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-
     // 부모 컴포넌트에 에러 전달
     this.props.onError?.(error, errorInfo);
   }
