@@ -7,8 +7,23 @@
 
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
 import { useAppDispatch, useAppSelector, createPost, selectPostsLoading } from '../store';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Container } from '@/components/ui/container';
+import { Section } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/common/SEO';
+import {
+  ArrowLeft,
+  Save,
+  Send,
+  Loader2,
+  FileText,
+  Tag,
+  BookOpen
+} from 'lucide-react';
 
 const PostCreatePage = () => {
   const navigate = useNavigate();
@@ -63,182 +78,220 @@ const PostCreatePage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '0.5rem' }}>새 게시글 작성</h1>
-      <p style={{ color: '#666', marginBottom: '2rem' }}>
-        게시글을 작성하고 발행하거나 임시저장할 수 있습니다.
-      </p>
+    <MainLayout>
+      <SEO
+        title="새 게시글 작성 | Blog"
+        description="새로운 블로그 게시글을 작성하세요"
+      />
 
-      <form onSubmit={handleSubmit}>
-        {/* 제목 */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label htmlFor="title" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            제목 <span style={{ color: '#e74c3c' }}>*</span>
-          </label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            disabled={loading}
-            placeholder="게시글 제목을 입력하세요"
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
-
-        {/* 발췌 */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label htmlFor="excerpt" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            발췌 (선택사항)
-          </label>
-          <input
-            id="excerpt"
-            type="text"
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            disabled={loading}
-            placeholder="게시글 요약 (미입력 시 본문 앞 150자 자동 추출)"
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
-
-        {/* 내용 */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label htmlFor="content" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            내용 <span style={{ color: '#e74c3c' }}>*</span>
-          </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            disabled={loading}
-            placeholder="게시글 내용을 입력하세요 (Markdown 지원)"
-            rows={15}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontFamily: 'inherit',
-              resize: 'vertical',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
-
-        {/* 태그 */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label htmlFor="tags" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            태그
-          </label>
-          <input
-            id="tags"
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            disabled={loading}
-            placeholder="쉼표로 구분 (예: React, TypeScript, CMS)"
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
-
-        {/* 상태 선택 */}
-        <div style={{ marginBottom: '2rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-            발행 상태 <span style={{ color: '#e74c3c' }}>*</span>
-          </label>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="status"
-                value="draft"
-                checked={status === 'draft'}
-                onChange={(e) => setStatus(e.target.value as 'draft')}
-                disabled={loading}
-                style={{ marginRight: '0.5rem' }}
-              />
-              <span>임시저장</span>
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="status"
-                value="published"
-                checked={status === 'published'}
-                onChange={(e) => setStatus(e.target.value as 'published')}
-                disabled={loading}
-                style={{ marginRight: '0.5rem' }}
-              />
-              <span>바로 발행</span>
-            </label>
-          </div>
-        </div>
-
-        {/* 버튼 */}
-        <div style={{ display: 'flex', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid #ddd' }}>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              padding: '0.75rem 2rem',
-              backgroundColor: loading ? '#95a5a6' : status === 'published' ? '#2ecc71' : '#3498db',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            }}
-          >
-            {loading ? '작성 중...' : status === 'published' ? '✅ 발행하기' : '💾 임시저장'}
-          </button>
-
-          <button
-            type="button"
+      {/* Header */}
+      <Section className="pt-8 pb-4">
+        <Container>
+          <Button
+            variant="ghost"
             onClick={() => navigate(ROUTES.POSTS)}
-            disabled={loading}
-            style={{
-              padding: '0.75rem 2rem',
-              backgroundColor: 'white',
-              color: '#666',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
+            className="group -ml-2 mb-6"
           >
-            취소
-          </button>
-        </div>
-      </form>
-    </div>
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            목록으로 돌아가기
+          </Button>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-accent to-purple-500 bg-clip-text text-transparent">
+              새 게시글 작성
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              게시글을 작성하고 발행하거나 임시저장할 수 있습니다.
+            </p>
+          </motion.div>
+        </Container>
+      </Section>
+
+      {/* Form */}
+      <Section className="py-8">
+        <Container>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="max-w-4xl mx-auto"
+          >
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Title */}
+              <div className="space-y-2">
+                <label htmlFor="title" className="flex items-center text-sm font-semibold text-foreground">
+                  <FileText className="w-4 h-4 mr-2 text-accent" />
+                  제목 <span className="text-destructive ml-1">*</span>
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  disabled={loading}
+                  placeholder="게시글 제목을 입력하세요"
+                  className="w-full px-4 py-3 bg-card border border-border rounded-lg
+                    text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    transition-all duration-200"
+                />
+              </div>
+
+              {/* Excerpt */}
+              <div className="space-y-2">
+                <label htmlFor="excerpt" className="flex items-center text-sm font-semibold text-foreground">
+                  <BookOpen className="w-4 h-4 mr-2 text-accent" />
+                  발췌 <span className="text-muted-foreground text-xs font-normal ml-2">(선택사항)</span>
+                </label>
+                <input
+                  id="excerpt"
+                  type="text"
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  disabled={loading}
+                  placeholder="게시글 요약 (미입력 시 본문 앞 150자 자동 추출)"
+                  className="w-full px-4 py-3 bg-card border border-border rounded-lg
+                    text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    transition-all duration-200"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="space-y-2">
+                <label htmlFor="content" className="flex items-center text-sm font-semibold text-foreground">
+                  <FileText className="w-4 h-4 mr-2 text-accent" />
+                  내용 <span className="text-destructive ml-1">*</span>
+                  <span className="text-muted-foreground text-xs font-normal ml-2">(Markdown 지원)</span>
+                </label>
+                <textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  required
+                  disabled={loading}
+                  placeholder="게시글 내용을 입력하세요&#10;&#10;# 마크다운 문법 사용 가능&#10;- **굵게**, *기울임*, `코드`&#10;- [링크](https://example.com)&#10;- 목록, 표, 코드 블록 등"
+                  rows={20}
+                  className="w-full px-4 py-3 bg-card border border-border rounded-lg
+                    text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    resize-vertical font-mono text-sm
+                    transition-all duration-200"
+                />
+              </div>
+
+              {/* Tags */}
+              <div className="space-y-2">
+                <label htmlFor="tags" className="flex items-center text-sm font-semibold text-foreground">
+                  <Tag className="w-4 h-4 mr-2 text-accent" />
+                  태그
+                </label>
+                <input
+                  id="tags"
+                  type="text"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  disabled={loading}
+                  placeholder="쉼표로 구분 (예: React, TypeScript, CMS)"
+                  className="w-full px-4 py-3 bg-card border border-border rounded-lg
+                    text-foreground placeholder:text-muted-foreground
+                    focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    transition-all duration-200"
+                />
+              </div>
+
+              {/* Status Selection */}
+              <div className="space-y-3">
+                <label className="flex items-center text-sm font-semibold text-foreground">
+                  발행 상태 <span className="text-destructive ml-1">*</span>
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="draft"
+                      checked={status === 'draft'}
+                      onChange={(e) => setStatus(e.target.value as 'draft')}
+                      disabled={loading}
+                      className="w-4 h-4 text-accent border-border focus:ring-2 focus:ring-accent/50 cursor-pointer"
+                    />
+                    <span className="ml-2 text-foreground group-hover:text-accent transition-colors">
+                      임시저장
+                    </span>
+                  </label>
+                  <label className="flex items-center cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="status"
+                      value="published"
+                      checked={status === 'published'}
+                      onChange={(e) => setStatus(e.target.value as 'published')}
+                      disabled={loading}
+                      className="w-4 h-4 text-accent border-border focus:ring-2 focus:ring-accent/50 cursor-pointer"
+                    />
+                    <span className="ml-2 text-foreground group-hover:text-accent transition-colors">
+                      바로 발행
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-8 border-t border-border">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  size="lg"
+                  className={`flex-1 ${
+                    status === 'published'
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'bg-accent hover:bg-accent/90'
+                  } shadow-lg hover:shadow-xl transition-all group`}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      작성 중...
+                    </>
+                  ) : status === 'published' ? (
+                    <>
+                      <Send className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" />
+                      발행하기
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                      임시저장
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate(ROUTES.POSTS)}
+                  disabled={loading}
+                  size="lg"
+                  className="flex-1"
+                >
+                  취소
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        </Container>
+      </Section>
+    </MainLayout>
   );
 };
 
