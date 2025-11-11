@@ -13,6 +13,7 @@ import { ROUTES } from '../router/routes';
 import { useAdminCheck } from '../hooks/useAdminCheck';
 import { StatsCard } from '../components/admin/StatsCard';
 import { useGetAdminStatsQuery } from '../features/admin/api/adminApi';
+import { AdminLayout } from '../components/layout/AdminLayout';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -26,7 +27,8 @@ const DashboardPage = () => {
   });
 
   return (
-    <div className="dashboard-container">
+    <AdminLayout>
+      <div className="dashboard-container">
       {/* Header */}
       <h1 className="dashboard-header-title" style={{
         fontSize: 'var(--font-size-3xl)',
@@ -291,7 +293,7 @@ const DashboardPage = () => {
       <div className="dashboard-user-cards-grid">
         {/* 게시글 관리 카드 */}
         <Link
-          to={ROUTES.POSTS}
+          to="/blog"
           style={{
             padding: 'var(--spacing-2xl)',
             background: 'var(--color-secondary-blue)',
@@ -328,7 +330,7 @@ const DashboardPage = () => {
 
         {/* 게시글 작성 카드 */}
         <Link
-          to={ROUTES.POSTS_CREATE}
+          to={ROUTES.BLOG_CREATE}
           style={{
             padding: 'var(--spacing-2xl)',
             background: 'var(--color-secondary-green)',
@@ -467,7 +469,8 @@ const DashboardPage = () => {
           최근 활동 내역이 여기에 표시됩니다.
         </p>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 

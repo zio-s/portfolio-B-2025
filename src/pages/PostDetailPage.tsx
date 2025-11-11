@@ -1,8 +1,8 @@
 /**
  * 게시글 상세 페이지
  *
- * 개별 게시글의 상세 내용을 보여주는 페이지입니다.
- * localStorage 기반 Redux store에서 실제 데이터를 가져옵니다.
+ * Supabase 기반 RTK Query로 게시글 상세 정보를 가져옵니다.
+ * 조회수 자동 증가, 좋아요, 댓글 기능을 포함합니다.
  */
 
 import { useEffect } from 'react';
@@ -13,14 +13,12 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
-  useAppDispatch,
   useAppSelector,
-  fetchPostById,
-  deletePost,
-  selectCurrentPost,
-  selectPostsLoading,
-  selectPostsError,
   selectUser,
+  useGetPostByIdQuery,
+  useDeletePostMutation,
+  useToggleLikeMutation,
+  useIncrementViewMutation,
 } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
@@ -28,6 +26,9 @@ import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
+import { PostCommentList } from '@/features/post-comments/components/PostCommentList';
+import { PostCommentForm } from '@/features/post-comments/components/PostCommentForm';
+import { useAlertModal } from '@/components/modal/hooks';
 import {
   ArrowLeft,
   Calendar,
@@ -35,30 +36,38 @@ import {
   Trash2,
   Loader2,
   AlertCircle,
-  Clock
+  Clock,
+  Heart,
+  MessageCircle,
+  Eye,
 } from 'lucide-react';
 
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useAppDispatch();
+  const { showAlert } = useAlertModal();
 
   const user = useAppSelector(selectUser);
-  const post = useAppSelector(selectCurrentPost);
-  const loading = useAppSelector(selectPostsLoading);
-  const error = useAppSelector(selectPostsError);
 
-  // 어드민 권한 확인: /posts 경로 또는 로그인한 사용자
-  const isAdmin = location.pathname.startsWith('/posts') || !!user;
-  const backPath = isAdmin ? ROUTES.POSTS : '/blog';
+  // 어드민 권한 확인: 로그인한 사용자
+  const isAdmin = !!user;
+  const backPath = '/blog';
 
-  // 게시글 조회
+  // RTK Query hooks
+  const { data: post, isLoading: loading, error } = useGetPostByIdQuery(id || '', {
+    skip: !id,
+  });
+  const [deletePostMutation] = useDeletePostMutation();
+  const [toggleLike] = useToggleLikeMutation();
+  const [incrementView] = useIncrementViewMutation();
+
+  // 조회수 자동 증가 (페이지 진입 시 1회만)
   useEffect(() => {
     if (id) {
-      dispatch(fetchPostById(id));
+      incrementView(id);
     }
-  }, [dispatch, id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // id가 변경될 때만 실행 (post 제거로 중복 호출 방지)
 
   // 게시글 삭제
   const handleDelete = async () => {
@@ -66,12 +75,32 @@ const PostDetailPage = () => {
 
     if (window.confirm(`"${post.title}" 게시글을 삭제하시겠습니까?`)) {
       try {
-        await dispatch(deletePost(id)).unwrap();
-        alert('게시글이 삭제되었습니다');
-        navigate(backPath);
+        await deletePostMutation(id).unwrap();
+        showAlert({
+          title: '완료',
+          message: '게시글이 삭제되었습니다',
+          type: 'success',
+          onConfirm: () => {
+            navigate(backPath);
+          },
+        });
       } catch {
-        alert('게시글 삭제에 실패했습니다');
+        showAlert({
+          title: '오류',
+          message: '게시글 삭제에 실패했습니다',
+          type: 'error',
+        });
       }
+    }
+  };
+
+  // 좋아요 토글
+  const handleLike = async () => {
+    if (!id) return;
+    try {
+      await toggleLike(id).unwrap();
+    } catch {
+      console.error('좋아요 처리 실패');
     }
   };
 
@@ -145,7 +174,9 @@ const PostDetailPage = () => {
               <div className="p-6 rounded-xl bg-destructive/10 border border-destructive/30 mb-6">
                 <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
                 <p className="font-medium text-destructive mb-1 text-center">오류가 발생했습니다</p>
-                <p className="text-sm text-muted-foreground text-center">{error}</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  {'data' in error ? (error.data as any)?.message : '게시글을 불러올 수 없습니다'}
+                </p>
               </div>
               <Link to={backPath}>
                 <Button variant="outline" className="w-full">
@@ -320,15 +351,56 @@ const PostDetailPage = () => {
               </motion.div>
             )}
 
+            {/* Stats Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="pt-8 border-t border-border"
+            >
+              <div className="flex items-center gap-6">
+                {/* Like Button */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleLike}
+                  className={`gap-2 transition-all ${
+                    post.is_liked
+                      ? 'text-red-500 border-red-500/50 hover:bg-red-50 dark:hover:bg-red-950'
+                      : 'hover:text-red-500 hover:border-red-500/50'
+                  }`}
+                >
+                  <Heart
+                    className={`w-5 h-5 transition-all ${
+                      post.is_liked ? 'fill-current' : ''
+                    }`}
+                  />
+                  <span className="font-semibold">{post.likes_count || 0}</span>
+                </Button>
+
+                {/* Comments Count */}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">{post.comments_count || 0}개의 댓글</span>
+                </div>
+
+                {/* Views Count */}
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Eye className="w-5 h-5" />
+                  <span className="text-sm font-medium">{post.views_count || 0}회 조회</span>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Action Buttons */}
             {isAdmin && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
                 className="flex gap-3 pt-8 border-t border-border"
               >
-                <Link to={routeHelpers.postEdit(post.id)} className="flex-1">
+                <Link to={routeHelpers.blogEdit(post.id)} className="flex-1">
                   <Button variant="outline" className="w-full group">
                     <Edit className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
                     수정
@@ -346,6 +418,37 @@ const PostDetailPage = () => {
               </motion.div>
             )}
           </motion.article>
+        </Container>
+      </Section>
+
+      {/* Comments Section */}
+      <Section className="py-12 bg-accent/5 dark:bg-accent/10">
+        <Container>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="max-w-4xl mx-auto"
+          >
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <MessageCircle className="w-6 h-6 text-accent" />
+              댓글
+            </h2>
+
+            {/* Comment Form */}
+            <div className="mb-8">
+              <PostCommentForm
+                postId={id!}
+                onSuccess={() => {
+                  // Comments will auto-refresh via RTK Query
+                }}
+                placeholder="댓글을 작성해주세요..."
+              />
+            </div>
+
+            {/* Comment List */}
+            <PostCommentList postId={id!} />
+          </motion.div>
         </Container>
       </Section>
     </MainLayout>

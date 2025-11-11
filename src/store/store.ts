@@ -8,6 +8,8 @@ import { projectsApi } from '../features/portfolio/api/projectsApi';
 import { commentsApi } from '../features/comments/api/commentsApi';
 import { adminApi } from '../features/admin/api/adminApi';
 import { guestbookApi } from '../features/guestbook/api/guestbookApi';
+import { postsApi } from './api/postsApi';
+import { postCommentsApi } from './api/postCommentsApi';
 
 // Configure Store
 export const store = configureStore({
@@ -22,6 +24,8 @@ export const store = configureStore({
     [commentsApi.reducerPath]: commentsApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [guestbookApi.reducerPath]: guestbookApi.reducer,
+    [postsApi.reducerPath]: postsApi.reducer,
+    [postCommentsApi.reducerPath]: postCommentsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -39,7 +43,9 @@ export const store = configureStore({
       .concat(projectsApi.middleware)
       .concat(commentsApi.middleware)
       .concat(adminApi.middleware)
-      .concat(guestbookApi.middleware),
+      .concat(guestbookApi.middleware)
+      .concat(postsApi.middleware)
+      .concat(postCommentsApi.middleware),
   devTools: import.meta.env.MODE !== 'production',
 });
 

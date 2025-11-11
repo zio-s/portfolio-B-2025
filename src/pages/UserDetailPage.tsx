@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
 import { selectUser } from '../store/slices/authSlice';
 import { ROUTES } from '../router/routes';
+import { AdminLayout } from '../components/layout/AdminLayout';
 
 const UserDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,10 +17,12 @@ const UserDetailPage = () => {
   // 관리자 권한 확인
   if (currentUser?.role !== 'admin') {
     return (
-      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>접근 권한 없음</h1>
-        <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
-      </div>
+      <AdminLayout>
+        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+          <h1>접근 권한 없음</h1>
+          <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -36,7 +39,8 @@ const UserDetailPage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+    <AdminLayout>
+      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <Link
           to={ROUTES.USERS}
@@ -179,7 +183,8 @@ const UserDetailPage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 

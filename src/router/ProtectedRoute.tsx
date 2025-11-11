@@ -12,7 +12,6 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { getCurrentUser, selectIsAuthenticated, selectAuthLoading } from '../store/slices/authSlice';
 import { PUBLIC_ROUTES } from './routes';
-import { MainLayout } from '../components/layout';
 
 /**
  * ProtectedRoute 컴포넌트 Props
@@ -106,14 +105,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   /**
-   * 인증된 경우 MainLayout으로 감싸서 자식 컴포넌트 렌더링
-   * MainLayout은 Redux에서 user를 가져오므로 prop 전달 불필요
+   * 인증된 경우 자식 컴포넌트 렌더링
+   * 각 페이지가 필요한 레이아웃을 직접 선택하도록 함
    */
-  return (
-    <MainLayout>
-      {children}
-    </MainLayout>
-  );
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

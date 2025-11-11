@@ -2,7 +2,7 @@
  * 게시글 수정 페이지
  *
  * 기존 게시글을 수정하는 페이지입니다.
- * localStorage 기반 Redux store에서 실제 데이터를 가져와 수정합니다.
+ * Supabase 기반 RTK Query로 게시글을 가져와 수정합니다.
  */
 
 import { useState, FormEvent, useEffect } from 'react';
@@ -10,19 +10,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { routeHelpers } from '../router/routes';
 import {
-  useAppDispatch,
-  useAppSelector,
-  fetchPostById,
-  updatePost,
-  selectCurrentPost,
-  selectPostsLoading,
-  selectPostsError,
+  useGetPostByIdQuery,
+  useUpdatePostMutation,
 } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { SEO } from '@/components/common/SEO';
+import { useAlertModal } from '@/components/modal/hooks';
 import {
   ArrowLeft,
   Save,
@@ -37,24 +33,18 @@ import {
 const PostEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const { showAlert } = useAlertModal();
 
-  const post = useAppSelector(selectCurrentPost);
-  const loading = useAppSelector(selectPostsLoading);
-  const error = useAppSelector(selectPostsError);
+  const { data: post, isLoading: loading, error } = useGetPostByIdQuery(id || '', {
+    skip: !id,
+  });
+  const [updatePost, { isLoading: updating }] = useUpdatePostMutation();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
-
-  // 게시글 데이터 로드
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchPostById(id));
-    }
-  }, [dispatch, id]);
 
   // 폼 상태 초기화
   useEffect(() => {
@@ -73,13 +63,6 @@ const PostEditPage = () => {
     if (!id) return;
 
     try {
-      // slug 생성 (제목을 기반으로)
-      const slug = title
-        .toLowerCase()
-        .replace(/[^\w\s가-힣]/g, '')
-        .replace(/\s+/g, '-')
-        .substring(0, 50);
-
       // 태그 배열 생성
       const tagArray = tags
         .split(',')
@@ -90,26 +73,32 @@ const PostEditPage = () => {
       const finalExcerpt = excerpt || content.substring(0, 150);
 
       // 게시글 수정
-      await dispatch(
-        updatePost({
-          id,
-          updates: {
-            title,
-            content,
-            excerpt: finalExcerpt,
-            slug,
-            status,
-            tags: tagArray,
-          }
-        })
-      ).unwrap();
+      await updatePost({
+        id,
+        updates: {
+          title,
+          content,
+          excerpt: finalExcerpt,
+          status,
+          tags: tagArray,
+        }
+      }).unwrap();
 
-      alert('게시글이 수정되었습니다!');
-
-      // 게시글 상세 페이지로 이동
-      navigate(routeHelpers.postDetail(id));
+      showAlert({
+        title: '완료',
+        message: '게시글이 수정되었습니다!',
+        type: 'success',
+        onConfirm: () => {
+          // 게시글 상세 페이지로 이동
+          navigate(routeHelpers.blogDetail(id));
+        },
+      });
     } catch {
-      alert('게시글 수정에 실패했습니다');
+      showAlert({
+        title: '오류',
+        message: '게시글 수정에 실패했습니다',
+        type: 'error',
+      });
     }
   };
 
@@ -143,11 +132,13 @@ const PostEditPage = () => {
               <div className="p-6 rounded-xl bg-destructive/10 border border-destructive/30 mb-6">
                 <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
                 <p className="font-medium text-destructive mb-1 text-center">오류가 발생했습니다</p>
-                <p className="text-sm text-muted-foreground text-center">{error}</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  {'data' in error ? (error.data as any)?.message : '게시글을 불러올 수 없습니다'}
+                </p>
               </div>
               <Button
                 variant="outline"
-                onClick={() => navigate(routeHelpers.postDetail(id!))}
+                onClick={() => navigate(routeHelpers.blogDetail(id!))}
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -202,7 +193,7 @@ const PostEditPage = () => {
         <Container>
           <Button
             variant="ghost"
-            onClick={() => navigate(routeHelpers.postDetail(id!))}
+            onClick={() => navigate(routeHelpers.blogDetail(id!))}
             className="group -ml-2 mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -363,7 +354,7 @@ const PostEditPage = () => {
               <div className="flex gap-3 pt-8 border-t border-border">
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || updating}
                   size="lg"
                   className={`flex-1 ${
                     status === 'published'
@@ -371,7 +362,7 @@ const PostEditPage = () => {
                       : 'bg-accent hover:bg-accent/90'
                   } shadow-lg hover:shadow-xl transition-all group`}
                 >
-                  {loading ? (
+                  {updating ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       저장 중...
@@ -392,8 +383,8 @@ const PostEditPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate(routeHelpers.postDetail(id!))}
-                  disabled={loading}
+                  onClick={() => navigate(routeHelpers.blogDetail(id!))}
+                  disabled={loading || updating}
                   size="lg"
                   className="flex-1"
                 >

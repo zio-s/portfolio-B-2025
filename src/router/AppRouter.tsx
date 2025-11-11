@@ -101,31 +101,13 @@ export const AppRouter = () => {
           {/* 방문록 라우트 - 공개 */}
           <Route path="/guestbook" element={<GuestbookPage />} />
 
-          {/* 블로그 라우트 - 공개 */}
+          {/* 블로그 라우트 - 공개 (로그인 시 관리 기능 표시) */}
           <Route path="/blog" element={<PostsPage />} />
           <Route path="/blog/:id" element={<PostDetailPage />} />
 
-          {/* 보호된 라우트 - 로그인 필요 */}
+          {/* 블로그 생성/수정 라우트 - 로그인 필요 */}
           <Route
-            path={ROUTES.DASHBOARD}
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* 게시글 관련 라우트 */}
-          <Route
-            path={ROUTES.POSTS}
-            element={
-              <ProtectedRoute>
-                <PostsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.POSTS_CREATE}
+            path={ROUTES.BLOG_CREATE}
             element={
               <ProtectedRoute>
                 <PostCreatePage />
@@ -133,18 +115,20 @@ export const AppRouter = () => {
             }
           />
           <Route
-            path={ROUTES.POSTS_DETAIL}
-            element={
-              <ProtectedRoute>
-                <PostDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.POSTS_EDIT}
+            path={ROUTES.BLOG_EDIT}
             element={
               <ProtectedRoute>
                 <PostEditPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 보호된 라우트 - 로그인 필요 */}
+          <Route
+            path={ROUTES.DASHBOARD}
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
               </ProtectedRoute>
             }
           />
