@@ -238,20 +238,33 @@ const PostsPage = () => {
         <Section className="py-12">
           <Container>
             <div className="space-y-6">
-              {posts.map((post, index) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  onClick={() => navigate(routeHelpers.blogDetail(post.id))}
-                  className="group bg-card border border-border rounded-xl p-6 hover:border-accent/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
-                >
-                  {/* Header: Title & Status */}
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                    <h3 className="flex-1 text-2xl font-bold text-foreground group-hover:text-accent transition-colors">
-                      {post.title}
-                    </h3>
+              {posts.map((post, index) => {
+                const postDate = new Date(post.publishedAt || post.createdAt);
+                const daysDiff = Math.floor((Date.now() - postDate.getTime()) / (1000 * 60 * 60 * 24));
+                const isNew = daysDiff >= 0 && daysDiff <= 3;
+
+                return (
+                  <motion.article
+                    key={post.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    onClick={() => navigate(routeHelpers.blogDetail(post.id))}
+                    className="group bg-card border border-border rounded-xl p-6 hover:border-accent/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
+                  >
+                    {/* Header: Title & Status */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-2 flex-1">
+                        <h3 className="text-2xl font-bold text-foreground group-hover:text-accent transition-colors">
+                          {post.title}
+                        </h3>
+                        {isNew && (
+                          <span className="relative flex h-2 w-2 shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-fuchsia-600"></span>
+                          </span>
+                        )}
+                      </div>
                     {isAdmin && (
                       <Badge
                         variant="outline"
@@ -348,7 +361,8 @@ const PostsPage = () => {
                     )}
                   </div>
                 </motion.article>
-              ))}
+                );
+              })}
             </div>
           </Container>
         </Section>
