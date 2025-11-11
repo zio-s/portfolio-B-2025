@@ -101,6 +101,10 @@ export const AppRouter = () => {
           {/* 방문록 라우트 - 공개 */}
           <Route path="/guestbook" element={<GuestbookPage />} />
 
+          {/* 블로그 라우트 - 공개 */}
+          <Route path="/blog" element={<PostsPage />} />
+          <Route path="/blog/:id" element={<PostDetailPage />} />
+
           {/* 보호된 라우트 - 로그인 필요 */}
           <Route
             path={ROUTES.DASHBOARD}
