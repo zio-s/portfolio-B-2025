@@ -5,7 +5,7 @@
  */
 
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
@@ -16,6 +16,7 @@ import {
   selectPostsLoading,
   selectPostsError,
   deletePost,
+  selectUser,
 } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
@@ -35,9 +36,14 @@ import {
 
 const PostsPage = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const user = useAppSelector(selectUser);
   const posts = useAppSelector(selectPosts);
   const loading = useAppSelector(selectPostsLoading);
   const error = useAppSelector(selectPostsError);
+
+  // 어드민 권한 확인: /posts 경로 또는 로그인한 사용자
+  const isAdmin = location.pathname.startsWith('/posts') || !!user;
 
   // 컴포넌트 마운트 시 게시글 목록 조회
   useEffect(() => {
@@ -122,18 +128,20 @@ const PostsPage = () => {
               </p>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <Link to={ROUTES.POSTS_CREATE}>
-                <Button size="lg" className="shadow-lg hover:shadow-xl transition-all group">
-                  <PenSquare className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                  새 게시글 작성
-                </Button>
-              </Link>
-            </motion.div>
+            {isAdmin && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Link to={ROUTES.POSTS_CREATE}>
+                  <Button size="lg" className="shadow-lg hover:shadow-xl transition-all group">
+                    <PenSquare className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                    새 게시글 작성
+                  </Button>
+                </Link>
+              </motion.div>
+            )}
           </div>
         </Container>
       </Section>
@@ -180,13 +188,17 @@ const PostsPage = () => {
                 <PenSquare className="w-12 h-12 text-accent" />
               </div>
               <h2 className="text-2xl font-bold mb-3">게시글이 없습니다</h2>
-              <p className="text-muted-foreground mb-8">첫 번째 게시글을 작성해보세요!</p>
-              <Link to={ROUTES.POSTS_CREATE}>
-                <Button size="lg" variant="outline">
-                  <PenSquare className="w-5 h-5 mr-2" />
-                  첫 게시글 작성하기
-                </Button>
-              </Link>
+              <p className="text-muted-foreground mb-8">
+                {isAdmin ? '첫 번째 게시글을 작성해보세요!' : '아직 작성된 게시글이 없습니다'}
+              </p>
+              {isAdmin && (
+                <Link to={ROUTES.POSTS_CREATE}>
+                  <Button size="lg" variant="outline">
+                    <PenSquare className="w-5 h-5 mr-2" />
+                    첫 게시글 작성하기
+                  </Button>
+                </Link>
+              )}
             </motion.div>
           </Container>
         </Section>
@@ -209,18 +221,20 @@ const PostsPage = () => {
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                     <h3 className="flex-1">
                       <Link
-                        to={routeHelpers.postDetail(post.id)}
+                        to={isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id)}
                         className="text-2xl font-bold text-foreground hover:text-accent transition-colors group-hover:underline decoration-accent/30 underline-offset-4"
                       >
                         {post.title}
                       </Link>
                     </h3>
-                    <Badge
-                      variant="outline"
-                      className={`${getStatusStyle(post.status)} px-3 py-1 text-xs font-semibold border shrink-0`}
-                    >
-                      {getStatusText(post.status)}
-                    </Badge>
+                    {isAdmin && (
+                      <Badge
+                        variant="outline"
+                        className={`${getStatusStyle(post.status)} px-3 py-1 text-xs font-semibold border shrink-0`}
+                      >
+                        {getStatusText(post.status)}
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Excerpt */}
@@ -254,27 +268,31 @@ const PostsPage = () => {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <Link to={routeHelpers.postDetail(post.id)}>
+                      <Link to={isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id)}>
                         <Button variant="outline" size="sm" className="group/btn">
                           <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                           상세보기
                         </Button>
                       </Link>
-                      <Link to={routeHelpers.postEdit(post.id)}>
-                        <Button variant="outline" size="sm" className="group/btn">
-                          <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-                          수정
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(post.id, post.title)}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                        삭제
-                      </Button>
+                      {isAdmin && (
+                        <>
+                          <Link to={routeHelpers.postEdit(post.id)}>
+                            <Button variant="outline" size="sm" className="group/btn">
+                              <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
+                              수정
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(post.id, post.title)}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                            삭제
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </motion.article>

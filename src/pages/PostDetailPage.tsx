@@ -6,7 +6,7 @@
  */
 
 import { useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,6 +20,7 @@ import {
   selectCurrentPost,
   selectPostsLoading,
   selectPostsError,
+  selectUser,
 } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
@@ -40,11 +41,17 @@ import {
 const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
 
+  const user = useAppSelector(selectUser);
   const post = useAppSelector(selectCurrentPost);
   const loading = useAppSelector(selectPostsLoading);
   const error = useAppSelector(selectPostsError);
+
+  // 어드민 권한 확인: /posts 경로 또는 로그인한 사용자
+  const isAdmin = location.pathname.startsWith('/posts') || !!user;
+  const backPath = isAdmin ? ROUTES.POSTS : '/blog';
 
   // 게시글 조회
   useEffect(() => {
@@ -61,7 +68,7 @@ const PostDetailPage = () => {
       try {
         await dispatch(deletePost(id)).unwrap();
         alert('게시글이 삭제되었습니다');
-        navigate(ROUTES.POSTS);
+        navigate(backPath);
       } catch {
         alert('게시글 삭제에 실패했습니다');
       }
@@ -140,7 +147,7 @@ const PostDetailPage = () => {
                 <p className="font-medium text-destructive mb-1 text-center">오류가 발생했습니다</p>
                 <p className="text-sm text-muted-foreground text-center">{error}</p>
               </div>
-              <Link to={ROUTES.POSTS}>
+              <Link to={backPath}>
                 <Button variant="outline" className="w-full">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   목록으로 돌아가기
@@ -169,7 +176,7 @@ const PostDetailPage = () => {
               </div>
               <h2 className="text-2xl font-bold mb-3">게시글을 찾을 수 없습니다</h2>
               <p className="text-muted-foreground mb-8">삭제되었거나 존재하지 않는 게시글입니다</p>
-              <Link to={ROUTES.POSTS}>
+              <Link to={backPath}>
                 <Button size="lg">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   목록으로 돌아가기
@@ -192,7 +199,7 @@ const PostDetailPage = () => {
       {/* Back Button */}
       <Section className="pt-8 pb-4">
         <Container>
-          <Link to={ROUTES.POSTS}>
+          <Link to={backPath}>
             <Button variant="ghost" className="group -ml-2">
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               목록으로 돌아가기
@@ -218,12 +225,14 @@ const PostDetailPage = () => {
                   <h1 className="text-4xl md:text-5xl font-bold leading-tight flex-1">
                     {post.title}
                   </h1>
-                  <Badge
-                    variant="outline"
-                    className={`${getStatusStyle(post.status)} px-3 py-1.5 text-xs font-semibold border shrink-0`}
-                  >
-                    {getStatusText(post.status)}
-                  </Badge>
+                  {isAdmin && (
+                    <Badge
+                      variant="outline"
+                      className={`${getStatusStyle(post.status)} px-3 py-1.5 text-xs font-semibold border shrink-0`}
+                    >
+                      {getStatusText(post.status)}
+                    </Badge>
+                  )}
                 </div>
               </div>
 
@@ -312,28 +321,30 @@ const PostDetailPage = () => {
             )}
 
             {/* Action Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex gap-3 pt-8 border-t border-border"
-            >
-              <Link to={routeHelpers.postEdit(post.id)} className="flex-1">
-                <Button variant="outline" className="w-full group">
-                  <Edit className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
-                  수정
-                </Button>
-              </Link>
-
-              <Button
-                variant="outline"
-                onClick={handleDelete}
-                className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 group"
+            {isAdmin && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="flex gap-3 pt-8 border-t border-border"
               >
-                <Trash2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                삭제
-              </Button>
-            </motion.div>
+                <Link to={routeHelpers.postEdit(post.id)} className="flex-1">
+                  <Button variant="outline" className="w-full group">
+                    <Edit className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                    수정
+                  </Button>
+                </Link>
+
+                <Button
+                  variant="outline"
+                  onClick={handleDelete}
+                  className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 group"
+                >
+                  <Trash2 className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                  삭제
+                </Button>
+              </motion.div>
+            )}
           </motion.article>
         </Container>
       </Section>
