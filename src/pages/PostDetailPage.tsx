@@ -43,8 +43,7 @@ const PostDetailPage = () => {
         await dispatch(deletePost(id)).unwrap();
         alert('게시글이 삭제되었습니다');
         navigate(ROUTES.POSTS);
-      } catch (error) {
-        console.error('Failed to delete post:', error);
+      } catch {
         alert('게시글 삭제에 실패했습니다');
       }
     }

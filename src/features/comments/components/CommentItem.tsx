@@ -93,8 +93,7 @@ export const CommentItem = ({
         } else {
           await unlikeComment(comment.id).unwrap();
         }
-      } catch (err) {
-        console.error('Failed to toggle like:', err);
+      } catch {
         // 실패 시 상태 복원 (버튼 + 숫자)
         setHasLiked(!newLikedState);
         setDisplayedLikes((prev) => (newLikedState ? Math.max(0, prev - 1) : prev + 1));

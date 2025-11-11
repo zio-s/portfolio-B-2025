@@ -57,8 +57,7 @@ const PostCreatePage = () => {
 
       // 생성된 게시글 상세 페이지로 이동
       navigate(routeHelpers.postDetail(result.id));
-    } catch (error) {
-      console.error('Failed to create post:', error);
+    } catch {
       alert('게시글 작성에 실패했습니다');
     }
   };

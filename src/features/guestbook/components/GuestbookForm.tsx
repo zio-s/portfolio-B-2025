@@ -102,7 +102,6 @@ export const GuestbookForm: React.FC = () => {
         content: '',
       });
     } catch (error: unknown) {
-      console.error('Failed to create guestbook entry:', error);
       let errorMessage = '방문록 등록에 실패했습니다.';
 
       if (error && typeof error === 'object') {

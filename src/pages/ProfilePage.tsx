@@ -27,8 +27,8 @@ const ProfilePage = () => {
     try {
       await dispatch(updateProfile({ name })).unwrap();
       setIsEditing(false);
-    } catch (error) {
-      console.error('Failed to update profile:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }

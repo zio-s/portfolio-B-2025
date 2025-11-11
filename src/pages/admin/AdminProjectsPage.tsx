@@ -48,13 +48,12 @@ export const AdminProjectsPage = () => {
             message: '프로젝트가 삭제되었습니다.',
             type: 'success',
           });
-        } catch (err) {
+        } catch {
           showAlert({
             title: '삭제 실패',
             message: '프로젝트 삭제에 실패했습니다.',
             type: 'error',
           });
-          console.error(err);
         }
       },
     });
@@ -74,13 +73,12 @@ export const AdminProjectsPage = () => {
           : '프로젝트가 Featured로 고정되었습니다.',
         type: 'success',
       });
-    } catch (err) {
+    } catch {
       showAlert({
         title: 'Featured 설정 실패',
         message: 'Featured 상태 변경에 실패했습니다.',
         type: 'error',
       });
-      console.error(err);
     }
   };
 
@@ -120,8 +118,6 @@ export const AdminProjectsPage = () => {
       setIsFormOpen(false);
       setEditingProject(null);
     } catch (err) {
-      console.error('Failed to save project:', err);
-
       showAlert({
         title: '저장 실패',
         message: '프로젝트 저장에 실패했습니다.',

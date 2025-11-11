@@ -32,8 +32,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.play().catch(() => {
-            // Auto-play might be blocked by browser
-            console.log('Auto-play prevented by browser');
+            // Auto-play might be blocked by browser - silently ignore
           });
         }
       }, 300);

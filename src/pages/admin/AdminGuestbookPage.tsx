@@ -45,13 +45,12 @@ export const AdminGuestbookPage = () => {
             message: '방문록이 삭제되었습니다.',
             type: 'success',
           });
-        } catch (err) {
+        } catch {
           showAlert({
             title: '삭제 실패',
             message: '방문록 삭제에 실패했습니다.',
             type: 'error',
           });
-          console.error(err);
         }
       },
     });
@@ -68,13 +67,12 @@ export const AdminGuestbookPage = () => {
           : `"${authorName}"님의 방문록이 상단에 고정되었습니다.`,
         type: 'success',
       });
-    } catch (err) {
+    } catch {
       showAlert({
         title: '고정 설정 실패',
         message: '고정 상태 변경에 실패했습니다.',
         type: 'error',
       });
-      console.error(err);
     }
   };
 
@@ -97,13 +95,12 @@ export const AdminGuestbookPage = () => {
       });
       setReplyingTo(null);
       setReplyText('');
-    } catch (err) {
+    } catch {
       showAlert({
         title: '답글 등록 실패',
         message: '답글 등록에 실패했습니다.',
         type: 'error',
       });
-      console.error(err);
     }
   };
 

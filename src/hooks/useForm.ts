@@ -251,8 +251,8 @@ export function useForm<T extends Record<string, unknown>>(
           setIsSubmitting(true);
           try {
             await onSubmit(values);
-          } catch (error) {
-            console.error('폼 제출 중 오류 발생:', error);
+          } catch {
+            // Error handled silently
           } finally {
             setIsSubmitting(false);
           }
