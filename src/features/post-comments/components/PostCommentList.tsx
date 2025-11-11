@@ -1,10 +1,12 @@
 /**
  * PostCommentList Component
  *
- * 블로그 게시글 댓글 목록 컴포넌트
+ * 블로그 게시글 댓글 목록 컴포넌트 - Tailwind CSS & Framer Motion
  */
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, User, Reply } from 'lucide-react';
 import { useGetPostCommentsQuery } from '../../../store/api/postCommentsApi';
 import { PostCommentForm } from './PostCommentForm';
 import type { PostComment } from '../../../store/types';
@@ -22,57 +24,17 @@ export const PostCommentList = ({ postId, maxDepth = 3 }: PostCommentListProps) 
    */
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              gap: '12px',
-              padding: '16px 0',
-              borderTop: '1px solid var(--border-color)',
-            }}
-          >
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                background: 'var(--background-secondary)',
-                flexShrink: 0,
-                animation: 'pulse 1.5s ease-in-out infinite',
-              }}
-            />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div
-                style={{
-                  width: '30%',
-                  height: '14px',
-                  background: 'var(--background-secondary)',
-                  borderRadius: '4px',
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }}
-              />
-              <div
-                style={{
-                  width: '100%',
-                  height: '48px',
-                  background: 'var(--background-secondary)',
-                  borderRadius: '4px',
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }}
-              />
+          <div key={i} className="flex gap-3 p-4 border-t border-border">
+            <div className="w-10 h-10 rounded-full bg-accent/10 animate-pulse shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-accent/10 rounded w-1/4 animate-pulse" />
+              <div className="h-3 bg-accent/10 rounded w-3/4 animate-pulse" />
+              <div className="h-3 bg-accent/10 rounded w-1/2 animate-pulse" />
             </div>
           </div>
         ))}
-        <style>
-          {`
-            @keyframes pulse {
-              0%, 100% { opacity: 1; }
-              50% { opacity: 0.5; }
-            }
-          `}
-        </style>
       </div>
     );
   }
@@ -82,33 +44,19 @@ export const PostCommentList = ({ postId, maxDepth = 3 }: PostCommentListProps) 
    */
   if (error) {
     return (
-      <div
-        style={{
-          padding: '32px',
-          textAlign: 'center',
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid #ef4444',
-          borderRadius: '12px',
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="p-8 text-center bg-destructive/10 border border-destructive/30 rounded-xl"
       >
-        <p style={{ fontSize: '16px', color: '#ef4444', marginBottom: '12px' }}>
-          댓글을 불러오는데 실패했습니다.
-        </p>
+        <p className="text-destructive font-medium mb-3">댓글을 불러오는데 실패했습니다.</p>
         <button
           onClick={() => refetch()}
-          style={{
-            padding: '8px 16px',
-            background: '#ef4444',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '14px',
-            cursor: 'pointer',
-          }}
+          className="px-4 py-2 bg-destructive text-white rounded-lg text-sm hover:bg-destructive/90 transition-colors"
         >
           다시 시도
         </button>
-      </div>
+      </motion.div>
     );
   }
 
@@ -117,21 +65,15 @@ export const PostCommentList = ({ postId, maxDepth = 3 }: PostCommentListProps) 
    */
   if (!data || data.length === 0) {
     return (
-      <div
-        style={{
-          padding: '48px 24px',
-          textAlign: 'center',
-          background: 'var(--background-secondary)',
-          borderRadius: '12px',
-        }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="py-12 px-6 text-center bg-accent/5 rounded-xl border border-accent/10"
       >
-        <p style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-          아직 댓글이 없습니다
-        </p>
-        <p style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>
-          첫 번째 댓글을 작성해보세요!
-        </p>
-      </div>
+        <MessageCircle className="w-12 h-12 mx-auto mb-4 text-accent/50" />
+        <p className="text-base text-muted-foreground mb-2">아직 댓글이 없습니다</p>
+        <p className="text-sm text-muted-foreground/70">첫 번째 댓글을 작성해보세요!</p>
+      </motion.div>
     );
   }
 
@@ -141,21 +83,24 @@ export const PostCommentList = ({ postId, maxDepth = 3 }: PostCommentListProps) 
   return (
     <div>
       {/* 댓글 개수 표시 */}
-      <div
-        style={{
-          marginBottom: '16px',
-          fontSize: '16px',
-          fontWeight: '600',
-          color: 'var(--text-primary)',
-        }}
-      >
-        댓글 {data.length}개
+      <div className="flex items-center gap-2 mb-6">
+        <MessageCircle className="w-5 h-5 text-accent" />
+        <span className="text-lg font-semibold text-foreground">
+          댓글 <span className="text-accent">{data.length}</span>개
+        </span>
       </div>
 
       {/* 댓글 트리 렌더링 */}
-      <div>
-        {data.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} postId={postId} depth={0} maxDepth={maxDepth} />
+      <div className="space-y-0">
+        {data.map((comment, index) => (
+          <CommentItem
+            key={comment.id}
+            comment={comment}
+            postId={postId}
+            depth={0}
+            maxDepth={maxDepth}
+            isLast={index === data.length - 1}
+          />
         ))}
       </div>
     </div>
@@ -170,128 +115,110 @@ interface CommentItemProps {
   postId: string;
   depth: number;
   maxDepth: number;
+  isLast?: boolean;
 }
 
-const CommentItem = ({ comment, postId, depth, maxDepth }: CommentItemProps) => {
+const CommentItem = ({ comment, postId, depth, maxDepth, isLast = false }: CommentItemProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
 
   const handleReplySuccess = () => {
     setShowReplyForm(false);
   };
 
-  // 계층 구조 표시를 위한 스타일
-  const isNested = depth > 0;
-  const canReply = depth < maxDepth;
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return '방금 전';
+    if (minutes < 60) return `${minutes}분 전`;
+    if (hours < 24) return `${hours}시간 전`;
+    if (days < 7) return `${days}일 전`;
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
 
   return (
-    <div
-      style={{
-        paddingLeft: isNested ? `${depth * 24}px` : '0',
-        borderLeft: isNested ? '2px solid var(--border-color)' : 'none',
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`${!isLast ? 'border-b border-border' : ''}`}
     >
       <div
-        style={{
-          display: 'flex',
-          gap: '12px',
-          padding: '16px 0',
-          borderTop: '1px solid var(--border-color)',
-        }}
+        className={`flex gap-3 p-4 ${depth > 0 ? 'ml-8 pl-6 border-l-2 border-accent/20' : ''}`}
       >
-        {/* Avatar */}
-        <div
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '16px',
-            fontWeight: '600',
-            flexShrink: 0,
-          }}
-        >
-          {comment.author_name.charAt(0).toUpperCase()}
+        {/* 아바타 */}
+        <div className="shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/20 to-accent/40 flex items-center justify-center text-accent font-semibold text-sm border-2 border-accent/10">
+            {comment.author_name.charAt(0).toUpperCase()}
+          </div>
         </div>
 
-        {/* Content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              {comment.author_name}
-            </span>
-            <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
-              {new Date(comment.created_at).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
+        {/* 댓글 내용 */}
+        <div className="flex-1 min-w-0">
+          {/* 작성자 & 날짜 */}
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="font-semibold text-foreground">{comment.author_name}</span>
+            <span className="text-xs text-muted-foreground">{formatDate(comment.created_at)}</span>
           </div>
 
-          {/* Body */}
-          <p
-            style={{
-              fontSize: '14px',
-              lineHeight: '1.6',
-              color: 'var(--text-secondary)',
-              marginBottom: '12px',
-              wordBreak: 'break-word',
-            }}
-          >
+          {/* 댓글 텍스트 */}
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap mb-3">
             {comment.content}
           </p>
 
-          {/* Actions */}
-          {canReply && (
+          {/* 답글 버튼 */}
+          {depth < maxDepth && (
             <button
               onClick={() => setShowReplyForm(!showReplyForm)}
-              style={{
-                fontSize: '13px',
-                color: '#667eea',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px 0',
-                fontWeight: '500',
-              }}
+              className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium transition-colors group"
             >
+              <Reply className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               {showReplyForm ? '취소' : '답글'}
             </button>
           )}
 
-          {/* Reply Form */}
-          {showReplyForm && (
-            <div style={{ marginTop: '12px' }}>
-              <PostCommentForm
-                postId={postId}
-                parentId={comment.id}
-                onSuccess={handleReplySuccess}
-                onCancel={() => setShowReplyForm(false)}
-                placeholder={`${comment.author_name}님에게 답글 작성...`}
-                autoFocus
-              />
-            </div>
-          )}
+          {/* 답글 폼 */}
+          <AnimatePresence>
+            {showReplyForm && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mt-3"
+              >
+                <PostCommentForm
+                  postId={postId}
+                  parentId={comment.id}
+                  onSuccess={handleReplySuccess}
+                  onCancel={() => setShowReplyForm(false)}
+                  placeholder={`${comment.author_name}님에게 답글 작성...`}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      {/* Nested Replies */}
+      {/* 대댓글 렌더링 */}
       {comment.replies && comment.replies.length > 0 && (
         <div>
-          {comment.replies.map((reply) => (
-            <CommentItem key={reply.id} comment={reply} postId={postId} depth={depth + 1} maxDepth={maxDepth} />
+          {comment.replies.map((reply, index) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              depth={depth + 1}
+              maxDepth={maxDepth}
+              isLast={index === comment.replies!.length - 1 && isLast}
+            />
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
-
-export default PostCommentList;
