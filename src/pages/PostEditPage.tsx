@@ -93,12 +93,14 @@ const PostEditPage = () => {
       await dispatch(
         updatePost({
           id,
-          title,
-          content,
-          excerpt: finalExcerpt,
-          slug,
-          status,
-          tags: tagArray,
+          updates: {
+            title,
+            content,
+            excerpt: finalExcerpt,
+            slug,
+            status,
+            tags: tagArray,
+          }
         })
       ).unwrap();
 
