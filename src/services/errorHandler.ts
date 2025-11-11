@@ -158,31 +158,9 @@ function isAxiosError(error: unknown): error is AxiosError {
  * @param context - 에러 발생 컨텍스트 (선택)
  */
 export function logError(error: ApiErrorClass, context?: string): void {
-  const isDevelopment = import.meta.env.MODE === 'development';
-
-  if (isDevelopment) {
-    console.group(`🚨 API 에러${context ? ` [${context}]` : ''}`);
-    console.error('메시지:', error.message);
-    console.error('상태 코드:', error.statusCode);
-
-    if (error.errorCode) {
-      console.error('에러 코드:', error.errorCode);
-    }
-
-    if (error.errors && error.errors.length > 0) {
-      console.error('유효성 검사 에러:', error.errors);
-    }
-
-    if (error.originalError) {
-      console.error('원본 에러:', error.originalError);
-    }
-
-    console.groupEnd();
-  } else {
-    // 프로덕션 환경: 에러 추적 서비스로 전송
-    // 예: Sentry, LogRocket, Datadog 등
-    // sendToErrorTrackingService(error, context);
-  }
+  // 프로덕션 환경: 에러 추적 서비스로 전송
+  // 예: Sentry, LogRocket, Datadog 등
+  // sendToErrorTrackingService(error, context);
 }
 
 /**

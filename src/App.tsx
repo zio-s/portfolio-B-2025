@@ -59,7 +59,7 @@ function App() {
               token: session.access_token,
             }));
           } catch (err) {
-            console.error('Error in auth state change:', err);
+            // Error in auth state change - silently handled
           } finally {
             // 3초 후 플래그 해제 (다른 세션 허용)
             setTimeout(() => {
@@ -96,13 +96,11 @@ function App() {
   // 전역 에러 핸들러
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
-      console.error('전역 에러 발생:', event.error);
-      // 필요시 에러 리포팅 서비스에 전송
+      // 전역 에러 발생 - 필요시 에러 리포팅 서비스에 전송
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('처리되지 않은 Promise 거부:', event.reason);
-      // 필요시 에러 리포팅 서비스에 전송
+      // 처리되지 않은 Promise 거부 - 필요시 에러 리포팅 서비스에 전송
     };
 
     window.addEventListener('error', handleError);

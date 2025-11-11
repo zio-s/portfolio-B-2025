@@ -37,8 +37,8 @@ const PostEditPage = () => {
 
       // 게시글 상세 페이지로 이동
       navigate(routeHelpers.postDetail(id!));
-    } catch (error) {
-      console.error('Failed to update post:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }

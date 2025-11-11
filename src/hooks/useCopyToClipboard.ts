@@ -52,7 +52,6 @@ export function useCopyToClipboard(): [
   const copyToClipboard = useCallback(async (text: string) => {
     // 브라우저 환경이 아니면 early return
     if (typeof window === 'undefined') {
-      console.warn('클립보드 API는 브라우저 환경에서만 사용 가능합니다');
       setState({
         value: null,
         success: false,
@@ -100,7 +99,6 @@ export function useCopyToClipboard(): [
         success: false,
         error: error instanceof Error ? error : new Error('클립보드 복사에 실패했습니다'),
       });
-      console.error('클립보드 복사 중 오류 발생:', error);
     }
   }, []);
 
