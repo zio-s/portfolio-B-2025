@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectUser, updateProfile, logout } from '../store/slices/authSlice';
 import { ROUTES } from '../router/routes';
+import { AdminLayout } from '../components/layout/AdminLayout';
 
 const ProfilePage = () => {
   const dispatch = useAppDispatch();
@@ -43,15 +44,18 @@ const ProfilePage = () => {
 
   if (!user) {
     return (
-      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-        <h1>프로필 정보를 불러올 수 없습니다.</h1>
-      </div>
+      <AdminLayout>
+        <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+          <h1>프로필 정보를 불러올 수 없습니다.</h1>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>내 프로필</h1>
+    <AdminLayout>
+      <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+        <h1>내 프로필</h1>
 
       <div style={{
         backgroundColor: 'white',
@@ -221,7 +225,8 @@ const ProfilePage = () => {
           로그아웃
         </button>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 

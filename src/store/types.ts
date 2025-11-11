@@ -17,19 +17,29 @@ export interface AuthState {
 
 // Posts Types
 export interface Post {
-  id: string;
+  id: string; // UUID
   title: string;
   content: string;
   excerpt: string;
-  slug: string;
+  slug?: string;
   status: 'draft' | 'published' | 'archived';
-  authorId: string;
+  authorId?: string | null;
+  author_id?: string | null; // Supabase snake_case
   author?: User;
   tags: string[];
   coverImage?: string;
   createdAt: string;
+  created_at?: string; // Supabase snake_case
   updatedAt: string;
+  updated_at?: string; // Supabase snake_case
   publishedAt?: string;
+  published_at?: string; // Supabase snake_case
+  // 통계 데이터
+  likes_count?: number;
+  views_count?: number;
+  comments_count?: number;
+  // 사용자별 상태
+  is_liked?: boolean;
 }
 
 export interface PostsState {
@@ -47,6 +57,27 @@ export interface PostsState {
     limit: number;
     total: number;
   };
+}
+
+// Post Comments Types
+export interface PostComment {
+  id: string; // UUID
+  post_id: string; // UUID
+  postId?: string; // camelCase alias
+  author_name: string;
+  authorName?: string; // camelCase alias
+  author_email?: string;
+  authorEmail?: string; // camelCase alias
+  content: string;
+  parent_id?: string | null; // UUID for nested comments
+  parentId?: string | null; // camelCase alias
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  createdAt?: string; // camelCase alias
+  updated_at: string;
+  updatedAt?: string; // camelCase alias
+  // Nested replies
+  replies?: PostComment[];
 }
 
 // Users Types

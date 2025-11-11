@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
 import { selectUser } from '../store/slices/authSlice';
 import { routeHelpers } from '../router/routes';
+import { AdminLayout } from '../components/layout/AdminLayout';
 
 const UsersPage = () => {
   const currentUser = useAppSelector(selectUser);
@@ -15,10 +16,12 @@ const UsersPage = () => {
   // 관리자 권한 확인
   if (currentUser?.role !== 'admin') {
     return (
-      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>접근 권한 없음</h1>
-        <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
-      </div>
+      <AdminLayout>
+        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+          <h1>접근 권한 없음</h1>
+          <p>이 페이지는 관리자만 접근할 수 있습니다.</p>
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -30,7 +33,8 @@ const UsersPage = () => {
   ];
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <AdminLayout>
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <h1>사용자 관리</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>전체 사용자: {mockUsers.length}명</p>
 
@@ -75,7 +79,7 @@ const UsersPage = () => {
                 <td style={{ padding: '1rem' }}>{user.createdAt}</td>
                 <td style={{ padding: '1rem' }}>
                   <Link
-                    to={routeHelpers.userDetail(user.id)}
+                    to={routeHelpers.userDetail(String(user.id))}
                     style={{
                       padding: '0.5rem 1rem',
                       backgroundColor: '#3498db',
@@ -93,7 +97,8 @@ const UsersPage = () => {
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 

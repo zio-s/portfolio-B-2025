@@ -2,19 +2,20 @@
  * 게시글 작성 페이지
  *
  * 새로운 게시글을 작성하는 페이지입니다.
- * localStorage 기반 Redux store에 실제로 저장됩니다.
+ * Supabase 기반 RTK Query로 게시글을 저장합니다.
  */
 
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
-import { useAppDispatch, useAppSelector, createPost, selectPostsLoading } from '../store';
+import { useCreatePostMutation } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { SEO } from '@/components/common/SEO';
+import { useAlertModal } from '@/components/modal/hooks';
 import {
   ArrowLeft,
   Save,
@@ -27,8 +28,8 @@ import {
 
 const PostCreatePage = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const loading = useAppSelector(selectPostsLoading);
+  const [createPost, { isLoading: loading }] = useCreatePostMutation();
+  const { showAlert } = useAlertModal();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -40,13 +41,6 @@ const PostCreatePage = () => {
     e.preventDefault();
 
     try {
-      // slug 생성 (제목을 기반으로)
-      const slug = title
-        .toLowerCase()
-        .replace(/[^\w\s가-힣]/g, '')
-        .replace(/\s+/g, '-')
-        .substring(0, 50);
-
       // 태그 배열 생성
       const tagArray = tags
         .split(',')
@@ -56,24 +50,30 @@ const PostCreatePage = () => {
       // 발췌 자동 생성 (입력 안 했으면)
       const finalExcerpt = excerpt || content.substring(0, 150);
 
-      // 게시글 생성
-      const result = await dispatch(
-        createPost({
-          title,
-          content,
-          excerpt: finalExcerpt,
-          slug,
-          status,
-          tags: tagArray,
-        })
-      ).unwrap();
+      // 게시글 생성 (Supabase가 자동으로 UUID 생성)
+      const result = await createPost({
+        title,
+        content,
+        excerpt: finalExcerpt,
+        status,
+        tags: tagArray,
+      }).unwrap();
 
-      alert(`게시글이 ${status === 'published' ? '발행' : '임시저장'}되었습니다!`);
-
-      // 생성된 게시글 상세 페이지로 이동
-      navigate(routeHelpers.postDetail(result.id));
+      showAlert({
+        title: '완료',
+        message: `게시글이 ${status === 'published' ? '발행' : '임시저장'}되었습니다!`,
+        type: 'success',
+        onConfirm: () => {
+          // 생성된 게시글 상세 페이지로 이동
+          navigate(routeHelpers.blogDetail(result.id));
+        },
+      });
     } catch {
-      alert('게시글 작성에 실패했습니다');
+      showAlert({
+        title: '오류',
+        message: '게시글 작성에 실패했습니다',
+        type: 'error',
+      });
     }
   };
 
@@ -89,7 +89,7 @@ const PostCreatePage = () => {
         <Container>
           <Button
             variant="ghost"
-            onClick={() => navigate(ROUTES.POSTS)}
+            onClick={() => navigate('/blog')}
             className="group -ml-2 mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -279,7 +279,7 @@ const PostCreatePage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate(ROUTES.POSTS)}
+                  onClick={() => navigate('/blog')}
                   disabled={loading}
                   size="lg"
                   className="flex-1"
