@@ -32,11 +32,9 @@ export const PROTECTED_ROUTES = {
   /** 대시보드 메인 */
   DASHBOARD: '/dashboard',
 
-  /** 게시글 관련 라우트 */
-  POSTS: '/posts',
-  POSTS_CREATE: '/posts/create',
-  POSTS_DETAIL: '/posts/:id',
-  POSTS_EDIT: '/posts/:id/edit',
+  /** 게시글 관련 라우트 - 생성/수정만 보호 */
+  BLOG_CREATE: '/blog/create',
+  BLOG_EDIT: '/blog/:id/edit',
 
   /** 사용자 관련 라우트 (관리자 전용) */
   USERS: '/users',
@@ -59,32 +57,25 @@ export const ROUTES = {
  */
 export const routeHelpers = {
   /**
-   * 블로그 상세 페이지 경로 생성 (공개)
+   * 블로그 상세 페이지 경로 생성
    * @param id - 게시글 ID
    * @returns 블로그 상세 페이지 경로
    */
-  blogDetail: (id: string | number): string => `/blog/${id}`,
-
-  /**
-   * 게시글 상세 페이지 경로 생성 (어드민)
-   * @param id - 게시글 ID
-   * @returns 게시글 상세 페이지 경로
-   */
-  postDetail: (id: string | number): string => `/posts/${id}`,
+  blogDetail: (id: string): string => `/blog/${id}`,
 
   /**
    * 게시글 수정 페이지 경로 생성
    * @param id - 게시글 ID
    * @returns 게시글 수정 페이지 경로
    */
-  postEdit: (id: string | number): string => `/posts/${id}/edit`,
+  blogEdit: (id: string): string => `/blog/${id}/edit`,
 
   /**
    * 사용자 상세 페이지 경로 생성
    * @param id - 사용자 ID
    * @returns 사용자 상세 페이지 경로
    */
-  userDetail: (id: string | number): string => `/users/${id}`,
+  userDetail: (id: string): string => `/users/${id}`,
 } as const;
 
 /**

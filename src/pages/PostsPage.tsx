@@ -1,22 +1,19 @@
 /**
  * 게시글 목록 페이지
  *
- * localStorage 기반 Redux store에서 실제 게시글 목록을 가져와 표시합니다.
+ * Supabase 기반 RTK Query로 게시글 목록을 가져와 표시합니다.
+ * 좋아요, 댓글, 조회수 통계를 포함합니다.
  */
 
-import { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
-  useAppDispatch,
   useAppSelector,
-  fetchPosts,
-  selectPosts,
-  selectPostsLoading,
-  selectPostsError,
-  deletePost,
   selectUser,
+  useGetPostsQuery,
+  useDeletePostMutation,
+  useToggleLikeMutation,
 } from '../store';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Container } from '@/components/ui/container';
@@ -24,6 +21,7 @@ import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
+import { useAlertModal } from '@/components/modal/hooks';
 import {
   PenSquare,
   Loader2,
@@ -31,36 +29,53 @@ import {
   Calendar,
   Edit,
   Trash2,
+  Heart,
+  MessageCircle,
+  Eye,
 } from 'lucide-react';
 
 const PostsPage = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
   const user = useAppSelector(selectUser);
-  const posts = useAppSelector(selectPosts);
-  const loading = useAppSelector(selectPostsLoading);
-  const error = useAppSelector(selectPostsError);
+  const { showAlert } = useAlertModal();
 
-  // 어드민 권한 확인: /posts 경로 또는 로그인한 사용자
-  const isAdmin = location.pathname.startsWith('/posts') || !!user;
+  // 어드민 권한 확인: 로그인한 사용자
+  const isAdmin = !!user;
 
-  // 컴포넌트 마운트 시 게시글 목록 조회
-  useEffect(() => {
-    dispatch(fetchPosts({}));
-  }, [dispatch]);
+  // RTK Query hooks - 로그인하면 모든 상태, 비로그인은 published만
+  const { data: posts = [], isLoading: loading, error } = useGetPostsQuery({
+    status: isAdmin ? undefined : 'published',
+  });
+  const [deletePostMutation] = useDeletePostMutation();
+  const [toggleLike] = useToggleLikeMutation();
 
   // 게시글 삭제 핸들러
   const handleDelete = async (id: string, title: string) => {
     if (window.confirm(`"${title}" 게시글을 삭제하시겠습니까?`)) {
       try {
-        await dispatch(deletePost(id)).unwrap();
-        alert('게시글이 삭제되었습니다');
-        // 목록 새로고침
-        dispatch(fetchPosts({}));
+        await deletePostMutation(id).unwrap();
+        showAlert({
+          title: '완료',
+          message: '게시글이 삭제되었습니다',
+          type: 'success',
+        });
       } catch {
-        alert('게시글 삭제에 실패했습니다');
+        showAlert({
+          title: '오류',
+          message: '게시글 삭제에 실패했습니다',
+          type: 'error',
+        });
       }
+    }
+  };
+
+  // 좋아요 토글 핸들러
+  const handleLike = async (e: React.MouseEvent, postId: string) => {
+    e.stopPropagation();
+    try {
+      await toggleLike(postId).unwrap();
+    } catch {
+      console.error('좋아요 처리 실패');
     }
   };
 
@@ -134,7 +149,7 @@ const PostsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <Link to={ROUTES.POSTS_CREATE}>
+                <Link to={ROUTES.BLOG_CREATE}>
                   <Button size="lg" className="shadow-lg hover:shadow-xl transition-all group">
                     <PenSquare className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                     새 게시글 작성
@@ -169,7 +184,9 @@ const PostsPage = () => {
             >
               <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
               <p className="font-medium text-destructive mb-1">오류가 발생했습니다</p>
-              <p className="text-sm text-muted-foreground">{error}</p>
+              <p className="text-sm text-muted-foreground">
+                {'data' in error ? (error.data as any)?.message : '게시글을 불러올 수 없습니다'}
+              </p>
             </motion.div>
           </Container>
         </Section>
@@ -192,7 +209,7 @@ const PostsPage = () => {
                 {isAdmin ? '첫 번째 게시글을 작성해보세요!' : '아직 작성된 게시글이 없습니다'}
               </p>
               {isAdmin && (
-                <Link to={ROUTES.POSTS_CREATE}>
+                <Link to={ROUTES.BLOG_CREATE}>
                   <Button size="lg" variant="outline">
                     <PenSquare className="w-5 h-5 mr-2" />
                     첫 게시글 작성하기
@@ -215,7 +232,7 @@ const PostsPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  onClick={() => navigate(isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id))}
+                  onClick={() => navigate(routeHelpers.blogDetail(post.id))}
                   className="group bg-card border border-border rounded-xl p-6 hover:border-accent/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
                 >
                   {/* Header: Title & Status */}
@@ -252,21 +269,55 @@ const PostsPage = () => {
                     </div>
                   )}
 
-                  {/* Footer: Date & Actions */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-border">
-                    {/* Date */}
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      {post.status === 'published' && post.publishedAt
-                        ? `발행일: ${formatDate(post.publishedAt)}`
-                        : `작성일: ${formatDate(post.createdAt)}`}
+                  {/* Footer: Stats, Date & Actions */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    {/* Stats & Like Button */}
+                    <div className="flex items-center gap-6">
+                      {/* Like Button */}
+                      <button
+                        onClick={(e) => handleLike(e, post.id)}
+                        className={`flex items-center gap-1.5 text-sm transition-colors ${
+                          post.is_liked
+                            ? 'text-red-500 hover:text-red-600'
+                            : 'text-muted-foreground hover:text-red-500'
+                        }`}
+                      >
+                        <Heart
+                          className={`w-4 h-4 transition-all ${
+                            post.is_liked ? 'fill-current' : ''
+                          }`}
+                        />
+                        <span className="font-medium">{post.likes_count || 0}</span>
+                      </button>
+
+                      {/* Comments */}
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <MessageCircle className="w-4 h-4" />
+                        <span>{post.comments_count || 0}</span>
+                      </div>
+
+                      {/* Views */}
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <Eye className="w-4 h-4" />
+                        <span>{post.views_count || 0}</span>
+                      </div>
+
+                      {/* Date */}
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground ml-auto">
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          {post.status === 'published' && (post.publishedAt || post.published_at)
+                            ? formatDate(post.publishedAt || post.published_at || post.createdAt)
+                            : formatDate(post.createdAt || post.created_at || '')}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Actions */}
+                    {/* Admin Actions */}
                     {isAdmin && (
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Link to={routeHelpers.postEdit(post.id)}>
-                          <Button variant="outline" size="sm" className="group/btn">
+                        <Link to={routeHelpers.blogEdit(post.id)} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full group/btn">
                             <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
                             수정
                           </Button>
@@ -275,7 +326,7 @@ const PostsPage = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(post.id, post.title)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
+                          className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
                         >
                           <Trash2 className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
                           삭제

@@ -89,6 +89,17 @@ export {
   selectNotificationsByType,
 } from './slices/uiSlice';
 
+// Posts API (RTK Query)
+export {
+  useGetPostsQuery,
+  useGetPostByIdQuery,
+  useCreatePostMutation,
+  useUpdatePostMutation,
+  useDeletePostMutation,
+  useToggleLikeMutation,
+  useIncrementViewMutation,
+} from './api/postsApi';
+
 // Types
 export type {
   User,
