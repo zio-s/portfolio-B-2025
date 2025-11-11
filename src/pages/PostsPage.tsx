@@ -5,7 +5,7 @@
  */
 
 import { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
@@ -31,11 +31,11 @@ import {
   Calendar,
   Edit,
   Trash2,
-  Eye
 } from 'lucide-react';
 
 const PostsPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const user = useAppSelector(selectUser);
   const posts = useAppSelector(selectPosts);
@@ -215,17 +215,13 @@ const PostsPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group bg-card border border-border rounded-xl p-6 hover:border-accent/50 transition-all duration-300 hover:shadow-lg"
+                  onClick={() => navigate(isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id))}
+                  className="group bg-card border border-border rounded-xl p-6 hover:border-accent/50 transition-all duration-300 hover:shadow-lg cursor-pointer"
                 >
                   {/* Header: Title & Status */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                    <h3 className="flex-1">
-                      <Link
-                        to={isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id)}
-                        className="text-2xl font-bold text-foreground hover:text-accent transition-colors group-hover:underline decoration-accent/30 underline-offset-4"
-                      >
-                        {post.title}
-                      </Link>
+                    <h3 className="flex-1 text-2xl font-bold text-foreground group-hover:text-accent transition-colors">
+                      {post.title}
                     </h3>
                     {isAdmin && (
                       <Badge
@@ -267,33 +263,25 @@ const PostsPage = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2">
-                      <Link to={isAdmin ? routeHelpers.postDetail(post.id) : routeHelpers.blogDetail(post.id)}>
-                        <Button variant="outline" size="sm" className="group/btn">
-                          <Eye className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                          상세보기
-                        </Button>
-                      </Link>
-                      {isAdmin && (
-                        <>
-                          <Link to={routeHelpers.postEdit(post.id)}>
-                            <Button variant="outline" size="sm" className="group/btn">
-                              <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
-                              수정
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDelete(post.id, post.title)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                            삭제
+                    {isAdmin && (
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Link to={routeHelpers.postEdit(post.id)}>
+                          <Button variant="outline" size="sm" className="group/btn">
+                            <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" />
+                            수정
                           </Button>
-                        </>
-                      )}
-                    </div>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(post.id, post.title)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 group/btn"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                          삭제
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </motion.article>
               ))}
