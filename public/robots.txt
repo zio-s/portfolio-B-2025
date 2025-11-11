@@ -2,9 +2,14 @@
 User-agent: *
 Allow: /
 
-# Disallow admin pages
+# Allow public blog pages
+Allow: /posts
+
+# Disallow admin pages and auth pages
 Disallow: /admin/
 Disallow: /login
+Disallow: /register
+Disallow: /dashboard
 
 # Sitemap location
 Sitemap: https://semincode.com/sitemap.xml
