@@ -12,13 +12,15 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Github, MessageCircle, Mail, ArrowRight } from 'lucide-react';
+import { Github, MessageCircle, Mail, ArrowRight, ChevronRight } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { ProjectCard } from '@/components/portfolio/ProjectCard';
 import { SEO } from '@/components/common/SEO';
 import { useGetProjectsQuery } from '../features/portfolio/api/projectsApi';
+import { useGetGuestbookQuery } from '../features/guestbook/api/guestbookApi';
+import { useGetPostsQuery } from '../store/api/postsApi';
 import { ROUTES } from '../router/routes';
 import { skills, type Skill } from '@/data/skills';
 // 개별 아이콘 직접 import (Tree-shaking 지원)
@@ -78,6 +80,17 @@ const HomePage = () => {
   // RTK Query로 프로젝트 목록 조회 (홈페이지에서는 featured만)
   const { data: projectsData } = useGetProjectsQuery({
     featured: true,
+  });
+
+  // 방명록 최근 3개 조회
+  const { data: guestbookData } = useGetGuestbookQuery({
+    limit: 3,
+    approvedOnly: true,
+  });
+
+  // 블로그 최근 3개 조회
+  const { data: postsData } = useGetPostsQuery({
+    status: 'published',
   });
 
   const { scrollYProgress } = useScroll();
@@ -148,7 +161,7 @@ const HomePage = () => {
       <motion.section
         ref={heroRef}
         style={{ opacity, scale }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-24 sm:pt-0 sm:pb-28"
       >
         {/* Animated background particles */}
         <div className="absolute inset-0">
@@ -175,13 +188,13 @@ const HomePage = () => {
 
         {/* Hero Content */}
         <motion.div
-          className="relative z-10 max-w-6xl mx-auto px-8 text-center sm:-mt-10 -mt-30"
+          className="relative z-10 max-w-6xl mx-auto px-4 sm:px-8 text-center"
         >
           <motion.h1
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-accent/60 via-accent to-purple-500 bg-clip-text text-transparent"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-accent/60 via-accent to-purple-500 bg-clip-text text-transparent"
           >
             Frontend Developer
           </motion.h1>
@@ -190,7 +203,7 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-2xl md:text-4xl text-muted-foreground mb-12 font-light"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-muted-foreground mb-8 sm:mb-12 font-light"
           >
             사용자 경험을 최우선으로 생각하는 개발자
           </motion.p>
@@ -199,10 +212,11 @@ const HomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base md:text-lg text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
           >
             React와 TypeScript로 견고한 웹 애플리케이션을 만들고,
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             세심한 애니메이션으로 사용자에게 즐거움을 전달합니다.
           </motion.p>
 
@@ -210,16 +224,16 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap gap-4 justify-center mb-12"
+            className="flex flex-wrap gap-3 sm:gap-4 justify-center mb-8 sm:mb-12"
           >
             <Link to={ROUTES.PROJECTS}>
-              <Button size="lg" className="shadow-lg hover:shadow-xl transition-all">
+              <Button size="lg" className="shadow-lg hover:shadow-xl transition-all text-sm sm:text-base">
                 View Projects
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
             <Link to={ROUTES.BLOG}>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="text-sm sm:text-base">
                 Read Blog
               </Button>
             </Link>
@@ -256,7 +270,7 @@ const HomePage = () => {
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-28 sm:bottom-28 left-1/2 -translate-x-1/2 "
+          className="absolute bottom-24 sm:bottom-25 left-1/2 -translate-x-1/2"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
@@ -426,47 +440,126 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-40 px-8 relative overflow-hidden fade-in-section bg-card/30">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-accent/10" />
-
-        <motion.div
-          className="max-w-4xl mx-auto text-center relative z-10"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <motion.h2
-            className="text-5xl md:text-6xl font-bold mb-8 leading-tight"
-            whileHover={{ scale: 1.02 }}
-          >
-            좋은 코드는 사용자의 <span className="text-accent">미소</span>에서 시작됩니다
-          </motion.h2>
-          <motion.p
-            className="text-xl text-muted-foreground mb-12 leading-relaxed"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            함께 만들어가는 가치, 그 여정에 동참하세요
-          </motion.p>
-          <Link to={ROUTES.GUESTBOOK}>
+      {/* Work & Guest Board Preview Section */}
+      <section className="py-16 px-8 fade-in-section bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Work Section */}
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="space-y-3"
             >
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 shadow-2xl hover:shadow-accent/50 transition-all"
+              <Link
+                to={ROUTES.BLOG}
+                className="flex items-center justify-between group mb-4"
               >
-                함께 일하실래요?
-              </Button>
+                <h3 className="text-lg font-bold text-foreground">Blog</h3>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+              </Link>
+
+              <div className="space-y-1.5">
+                {postsData?.slice(0, 3).map((post) => {
+                  const postDate = new Date(post.publishedAt || post.createdAt);
+                  const daysDiff = Math.floor((Date.now() - postDate.getTime()) / (1000 * 60 * 60 * 24));
+                  const isNew = daysDiff >= 0 && daysDiff <= 3;
+
+                  return (
+                    <Link
+                      key={post.id}
+                      to={`/blog/${post.id}`}
+                      className="block"
+                    >
+                      <div className="py-2 px-3 rounded border border-transparent hover:border-border/50 hover:bg-card/20 transition-all cursor-pointer group">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                              {post.title}
+                            </h4>
+                            {isNew && (
+                              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fuchsia-600"></span>
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-muted-foreground/70 shrink-0">
+                            {postDate.toLocaleDateString('ko-KR', {
+                              year: '2-digit',
+                              month: '2-digit',
+                              day: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </motion.div>
-          </Link>
-        </motion.div>
+
+            {/* Guest Board Section */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="space-y-3"
+            >
+              <Link
+                to={ROUTES.GUESTBOOK}
+                className="flex items-center justify-between group mb-4"
+              >
+                <h3 className="text-lg font-bold text-foreground">Guest Board</h3>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+              </Link>
+
+              <div className="space-y-1.5">
+                {guestbookData?.items.slice(0, 3).map((entry) => {
+                  const entryDate = new Date(entry.createdAt);
+                  const daysDiff = Math.floor((Date.now() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+                  const isNew = daysDiff >= 0 && daysDiff <= 3;
+
+                  return (
+                    <Link
+                      key={entry.id}
+                      to={ROUTES.GUESTBOOK}
+                      className="block"
+                    >
+                      <div className="py-2 px-3 rounded border border-transparent hover:border-border/50 hover:bg-card/20 transition-all cursor-pointer group">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent/30 to-accent/60 flex items-center justify-center text-white font-semibold text-[10px] shrink-0">
+                              {entry.authorName.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">
+                              {entry.authorName}
+                            </span>
+                            {isNew && (
+                              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-fuchsia-600"></span>
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-muted-foreground/70 shrink-0">
+                            {entryDate.toLocaleDateString('ko-KR', {
+                              year: '2-digit',
+                              month: '2-digit',
+                              day: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
     </MainLayout>
   );
