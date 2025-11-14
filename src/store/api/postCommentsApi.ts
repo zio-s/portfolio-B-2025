@@ -181,11 +181,11 @@ export const postCommentsApi = createApi({
     }),
 
     // ========================================
-    // 댓글 삭제 (관리자용)
+    // 댓글 삭제
     // ========================================
 
     /**
-     * 댓글 삭제 (관리자용)
+     * 댓글 삭제
      */
     deletePostComment: builder.mutation<void, string>({
       query: (id) => buildSupabaseQuery.delete('post_comments', id),

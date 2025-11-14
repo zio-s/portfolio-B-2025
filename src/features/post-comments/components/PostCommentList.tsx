@@ -6,9 +6,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, User, Reply } from 'lucide-react';
-import { useGetPostCommentsQuery } from '../../../store/api/postCommentsApi';
+import { MessageCircle, Reply, Trash2 } from 'lucide-react';
+import { useGetPostCommentsQuery, useDeletePostCommentMutation } from '../../../store/api/postCommentsApi';
 import { PostCommentForm } from './PostCommentForm';
+import { useAlertModal, useConfirmModal } from '@/components/modal/hooks';
 import type { PostComment } from '../../../store/types';
 
 interface PostCommentListProps {
@@ -120,9 +121,50 @@ interface CommentItemProps {
 
 const CommentItem = ({ comment, postId, depth, maxDepth, isLast = false }: CommentItemProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [deleteComment, { isLoading: isDeleting }] = useDeletePostCommentMutation();
+  const { showAlert } = useAlertModal();
+  const { showConfirm } = useConfirmModal();
+
+  // localStorage에서 본인 댓글인지 확인
+  const isMyComment = () => {
+    const myComments = JSON.parse(localStorage.getItem('myComments') || '[]');
+    return myComments.includes(comment.id);
+  };
 
   const handleReplySuccess = () => {
     setShowReplyForm(false);
+  };
+
+  const handleDeleteClick = () => {
+    showConfirm({
+      title: '댓글 삭제',
+      message: '댓글을 삭제하시겠습니까?',
+      type: 'danger',
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: async () => {
+        try {
+          await deleteComment(comment.id).unwrap();
+
+          // localStorage에서 삭제
+          const myComments = JSON.parse(localStorage.getItem('myComments') || '[]');
+          const updatedComments = myComments.filter((id: string) => id !== comment.id);
+          localStorage.setItem('myComments', JSON.stringify(updatedComments));
+
+          showAlert({
+            title: '완료',
+            message: '댓글이 삭제되었습니다',
+            type: 'success',
+          });
+        } catch (error) {
+          showAlert({
+            title: '오류',
+            message: '댓글 삭제에 실패했습니다',
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -170,16 +212,30 @@ const CommentItem = ({ comment, postId, depth, maxDepth, isLast = false }: Comme
             {comment.content}
           </p>
 
-          {/* 답글 버튼 */}
-          {depth < maxDepth && (
-            <button
-              onClick={() => setShowReplyForm(!showReplyForm)}
-              className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium transition-colors group"
-            >
-              <Reply className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              {showReplyForm ? '취소' : '답글'}
-            </button>
-          )}
+          {/* 답글 & 삭제 버튼 */}
+          <div className="flex items-center gap-4">
+            {depth < maxDepth && (
+              <button
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium transition-colors group"
+              >
+                <Reply className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                {showReplyForm ? '취소' : '답글'}
+              </button>
+            )}
+
+            {/* 본인 댓글일 때만 삭제 버튼 표시 */}
+            {isMyComment() && (
+              <button
+                onClick={handleDeleteClick}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-1.5 text-xs text-destructive/70 hover:text-destructive font-medium transition-colors group disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                삭제
+              </button>
+            )}
+          </div>
 
           {/* 답글 폼 */}
           <AnimatePresence>
