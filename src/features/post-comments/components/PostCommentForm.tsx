@@ -63,13 +63,20 @@ export const PostCommentForm = ({
     if (!validateForm()) return;
 
     try {
-      await createComment({
+      const result = await createComment({
         post_id: postId,
         content: content.trim(),
         author_name: isLoggedIn ? currentUser!.name : authorName.trim(),
         author_email: isLoggedIn ? currentUser!.email : (authorEmail.trim() || undefined),
         parent_id: parentId || null,
       }).unwrap();
+
+      // 작성한 댓글 ID를 localStorage에 저장
+      if (result && typeof result === 'object' && 'id' in result) {
+        const myComments = JSON.parse(localStorage.getItem('myComments') || '[]');
+        myComments.push(result.id);
+        localStorage.setItem('myComments', JSON.stringify(myComments));
+      }
 
       // 성공 시 폼 초기화
       setContent('');

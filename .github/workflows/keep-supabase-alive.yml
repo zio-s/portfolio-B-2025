@@ -13,7 +13,12 @@ jobs:
     steps:
       - name: Ping Supabase Database
         run: |
-          curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/projects?select=count" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
-          echo "Supabase pinged successfully at $(date)"
+          # Health check를 통한 Supabase 활성화
+          response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.SUPABASE_URL }}/rest/v1/")
+          if [ $response -eq 200 ] || [ $response -eq 401 ]; then
+            echo "✅ Supabase pinged successfully at $(date)"
+            echo "HTTP Status: $response"
+          else
+            echo "⚠️ Unexpected status: $response"
+            exit 1
+          fi
