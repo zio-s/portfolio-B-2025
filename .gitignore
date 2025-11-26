@@ -4,7 +4,7 @@ node_modules
 .pnp.js
 
 # 빌드 결과물
-dist
+# dist - 프리렌더링된 HTML 커밋을 위해 제외
 dist-ssr
 build
 *.local

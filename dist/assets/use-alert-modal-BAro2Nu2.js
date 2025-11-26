@@ -1,0 +1,1 @@
+import{r as e}from"./vendor-react-DCKpLLFa.js";import{m as o}from"./index-Gdjm1SHZ.js";function c(){const t=e.useCallback(r=>o.alert(r),[]),a=e.useCallback(r=>{o.close(r)},[]);return{showAlert:t,closeAlert:a}}export{c as u};
