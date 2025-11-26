@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "yarn generate-sitemap && tsc -b && vite build && yarn prerender",
+    "build:no-prerender": "yarn generate-sitemap && tsc -b && vite build",
+    "prerender": "tsx scripts/prerender.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
@@ -13,7 +15,8 @@
     "clean": "rm -rf dist node_modules/.vite",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "db:types": "dotenv -e .env.local -- supabase gen types typescript --project-id smgwzotugeqzahcxicsa > src/lib/database.types.ts",
-    "migrate": "tsx migration/run-migration.ts"
+    "migrate": "tsx migration/run-migration.ts",
+    "generate-sitemap": "tsx scripts/generate-sitemap.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -69,6 +72,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
+    "puppeteer": "^24.31.0",
     "supabase": "^2.54.11",
     "tailwindcss": "4.1.16",
     "tailwindcss-animate": "^1.0.7",

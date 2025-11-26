@@ -112,6 +112,16 @@ function App() {
     };
   }, []);
 
+  // SEO: Prerender 완료 이벤트 발생 (빌드 시 정적 HTML 생성용)
+  useEffect(() => {
+    // 페이지 렌더링 완료 후 이벤트 발생
+    const timer = setTimeout(() => {
+      document.dispatchEvent(new Event('render-complete'));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <ThemeProvider>
       <BrowserRouter>
