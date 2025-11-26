@@ -1,5 +1,6 @@
 {
-  "buildCommand": "yarn build:no-prerender",
+  "buildCommand": "",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
