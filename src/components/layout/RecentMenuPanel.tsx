@@ -23,6 +23,7 @@ import {
   removeRecentItem,
   type RecentMenuItem,
 } from '../../store/slices/recentMenuSlice';
+import { useConfirmModal } from '@/components/modal/hooks';
 import './recentMenuPanel.css';
 
 /**
@@ -74,6 +75,7 @@ export const RecentMenuPanel = () => {
   const dispatch = useAppDispatch();
   const recentItems = useAppSelector(selectRecentItems);
   const itemsCount = useAppSelector(selectRecentItemsCount);
+  const { showConfirm } = useConfirmModal();
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,10 +113,17 @@ export const RecentMenuPanel = () => {
    * 전체 삭제
    */
   const handleClearAll = () => {
-    if (window.confirm('최근 방문 기록을 모두 삭제하시겠습니까?')) {
-      dispatch(clearRecentItems());
-      closePanel();
-    }
+    showConfirm({
+      title: '전체 삭제',
+      message: '최근 방문 기록을 모두 삭제하시겠습니까?',
+      type: 'warning',
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => {
+        dispatch(clearRecentItems());
+        closePanel();
+      },
+    });
   };
 
   /**

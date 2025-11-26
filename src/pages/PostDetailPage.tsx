@@ -28,7 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
 import { PostCommentList } from '@/features/post-comments/components/PostCommentList';
 import { PostCommentForm } from '@/features/post-comments/components/PostCommentForm';
-import { useAlertModal } from '@/components/modal/hooks';
+import { useAlertModal, useConfirmModal } from '@/components/modal/hooks';
 import {
   ArrowLeft,
   Calendar,
@@ -46,6 +46,7 @@ const PostDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showAlert } = useAlertModal();
+  const { showConfirm } = useConfirmModal();
 
   const user = useAppSelector(selectUser);
 
@@ -76,25 +77,32 @@ const PostDetailPage = () => {
   const handleDelete = async () => {
     if (!id || !post) return;
 
-    if (window.confirm(`"${post.title}" 게시글을 삭제하시겠습니까?`)) {
-      try {
-        await deletePostMutation(id).unwrap();
-        showAlert({
-          title: '완료',
-          message: '게시글이 삭제되었습니다',
-          type: 'success',
-          onConfirm: () => {
-            navigate(backPath);
-          },
-        });
-      } catch {
-        showAlert({
-          title: '오류',
-          message: '게시글 삭제에 실패했습니다',
-          type: 'error',
-        });
-      }
-    }
+    showConfirm({
+      title: '삭제 확인',
+      message: `"${post.title}" 게시글을 정말 삭제하시겠습니까?`,
+      type: 'danger',
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: async () => {
+        try {
+          await deletePostMutation(id).unwrap();
+          showAlert({
+            title: '완료',
+            message: '게시글이 삭제되었습니다',
+            type: 'success',
+            onConfirm: () => {
+              navigate(backPath);
+            },
+          });
+        } catch {
+          showAlert({
+            title: '오류',
+            message: '게시글 삭제에 실패했습니다',
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   // 좋아요 토글

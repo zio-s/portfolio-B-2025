@@ -22,7 +22,7 @@ import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
-import { useAlertModal } from '@/components/modal/hooks';
+import { useAlertModal, useConfirmModal } from '@/components/modal/hooks';
 import {
   PenSquare,
   Loader2,
@@ -39,6 +39,7 @@ const PostsPage = () => {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const { showAlert } = useAlertModal();
+  const { showConfirm } = useConfirmModal();
 
   // 어드민 권한 확인: 로그인한 사용자
   const isAdmin = !!user;
@@ -55,22 +56,29 @@ const PostsPage = () => {
 
   // 게시글 삭제 핸들러
   const handleDelete = async (id: string, title: string) => {
-    if (window.confirm(`"${title}" 게시글을 삭제하시겠습니까?`)) {
-      try {
-        await deletePostMutation(id).unwrap();
-        showAlert({
-          title: '완료',
-          message: '게시글이 삭제되었습니다',
-          type: 'success',
-        });
-      } catch {
-        showAlert({
-          title: '오류',
-          message: '게시글 삭제에 실패했습니다',
-          type: 'error',
-        });
-      }
-    }
+    showConfirm({
+      title: '삭제 확인',
+      message: `"${title}" 게시글을 정말 삭제하시겠습니까?`,
+      type: 'danger',
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: async () => {
+        try {
+          await deletePostMutation(id).unwrap();
+          showAlert({
+            title: '완료',
+            message: '게시글이 삭제되었습니다',
+            type: 'success',
+          });
+        } catch {
+          showAlert({
+            title: '오류',
+            message: '게시글 삭제에 실패했습니다',
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   // 좋아요 토글 핸들러
