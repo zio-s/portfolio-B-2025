@@ -19,6 +19,7 @@ import {
   clearRecentItems,
   removeRecentItem,
 } from '../../store/slices/recentMenuSlice';
+import { useConfirmModal } from '@/components/modal/hooks';
 import './recentMenu.css';
 
 /**
@@ -43,6 +44,7 @@ export const RecentMenuDropdown = () => {
   const dispatch = useAppDispatch();
   const recentItems = useAppSelector(selectRecentItems);
   const itemsCount = useAppSelector(selectRecentItemsCount);
+  const { showConfirm } = useConfirmModal();
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -58,10 +60,17 @@ export const RecentMenuDropdown = () => {
    * 전체 항목 삭제
    */
   const handleClearAll = () => {
-    if (window.confirm('최근 방문 기록을 모두 삭제하시겠습니까?')) {
-      dispatch(clearRecentItems());
-      setIsOpen(false);
-    }
+    showConfirm({
+      title: '전체 삭제',
+      message: '최근 방문 기록을 모두 삭제하시겠습니까?',
+      type: 'warning',
+      confirmText: '삭제',
+      cancelText: '취소',
+      onConfirm: () => {
+        dispatch(clearRecentItems());
+        setIsOpen(false);
+      },
+    });
   };
 
   /**

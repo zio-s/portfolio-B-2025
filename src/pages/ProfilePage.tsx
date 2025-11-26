@@ -10,11 +10,13 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectUser, updateProfile, logout } from '../store/slices/authSlice';
 import { ROUTES } from '../router/routes';
 import { AdminLayout } from '../components/layout/AdminLayout';
+import { useConfirmModal } from '@/components/modal/hooks';
 
 const ProfilePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const { showConfirm } = useConfirmModal();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -36,10 +38,17 @@ const ProfilePage = () => {
   };
 
   const handleLogout = async () => {
-    if (window.confirm('로그아웃 하시겠습니까?')) {
-      await dispatch(logout());
-      navigate(ROUTES.HOME);
-    }
+    showConfirm({
+      title: '로그아웃',
+      message: '로그아웃 하시겠습니까?',
+      type: 'warning',
+      confirmText: '로그아웃',
+      cancelText: '취소',
+      onConfirm: async () => {
+        await dispatch(logout());
+        navigate(ROUTES.HOME);
+      },
+    });
   };
 
   if (!user) {
