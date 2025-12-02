@@ -6,11 +6,13 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ROUTES, routeHelpers } from '../router/routes';
 import {
   useAppSelector,
@@ -321,27 +323,38 @@ const PostDetailPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="prose prose-lg dark:prose-invert max-w-none mb-12
-                prose-headings:font-bold prose-headings:tracking-tight
-                prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12
-                prose-h2:text-3xl prose-h2:mb-4 prose-h2:mt-10
-                prose-h3:text-2xl prose-h3:mb-3 prose-h3:mt-8
-                prose-p:leading-relaxed prose-p:mb-4
-                prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                prose-code:text-accent prose-code:bg-accent/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-[''] prose-code:after:content-['']
-                prose-pre:bg-card prose-pre:border prose-pre:border-border prose-pre:shadow-lg
-                prose-blockquote:border-l-accent prose-blockquote:bg-accent/5 prose-blockquote:py-1
-                prose-ul:my-4 prose-ol:my-4
-                prose-li:my-2
-                prose-img:rounded-xl prose-img:shadow-lg
-                prose-hr:border-border prose-hr:my-12
-                prose-table:border-collapse prose-table:border prose-table:border-border
-                prose-th:bg-accent/10 prose-th:border prose-th:border-border prose-th:p-3
-                prose-td:border prose-td:border-border prose-td:p-3"
+              className="prose prose-lg prose-invert max-w-none mb-12"
             >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
+                components={{
+                  code({ className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '');
+                    const isInline = !match && !className;
+
+                    return isInline ? (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    ) : (
+                      <SyntaxHighlighter
+                        style={vscDarkPlus}
+                        language={match ? match[1] : 'text'}
+                        showLineNumbers={true}
+                        wrapLongLines={true}
+                        customStyle={{
+                          margin: '1.5rem 0',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.875rem',
+                          lineHeight: '1.6',
+                        }}
+                      >
+                        {String(children).replace(/\n$/, '')}
+                      </SyntaxHighlighter>
+                    );
+                  },
+                }}
               >
                 {post.content}
               </ReactMarkdown>
