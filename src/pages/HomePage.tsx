@@ -18,10 +18,10 @@ import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { ProjectCard } from '@/components/portfolio/ProjectCard';
 import { SEO } from '@/components/common/SEO';
-import { useGetProjectsQuery } from '../features/portfolio/api/projectsApi';
-import { useGetGuestbookQuery } from '../features/guestbook/api/guestbookApi';
-import { useGetPostsQuery } from '../store/api/postsApi';
-import { ROUTES } from '../router/routes';
+import {useGetProjectsQuery} from "@/features/portfolio/api/projectsApi.ts";
+import {useGetGuestbookQuery} from "@/features/guestbook/api/guestbookApi.ts";
+import {useGetPostsQuery} from "@/store";
+import {ROUTES} from "@/router";
 import { skills, type Skill } from '@/data/skills';
 // 개별 아이콘 직접 import (Tree-shaking 지원)
 import AmazonwebservicesOriginalWordmark from 'devicons-react/lib/icons/AmazonwebservicesOriginalWordmark';
@@ -331,11 +331,8 @@ const HomePage = () => {
                       const IconComponent = iconMap[skill.icon];
                       return (
                         <Tooltip key={skill.name} position="bottom" content={skill.tooltip}>
-                          <motion.div
+                          <div
                             className="skill-badge cursor-pointer flex justify-center items-center flex-col text-center p-2 rounded-lg border border-transparent hover:border-accent/50 transition-colors"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
                           >
                             <div className="w-8 h-8 flex items-center justify-center">
                               {IconComponent ? (
@@ -352,7 +349,7 @@ const HomePage = () => {
                             <span className="text-[10px] text-muted-foreground leading-tight flex items-center justify-center py-2">
                               {skill.name}
                             </span>
-                          </motion.div>
+                          </div>
                         </Tooltip>
                       );
                     })}

@@ -282,10 +282,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               <div className="flex flex-wrap items-center gap-5 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="w-4 h-4" />
-                  <span>{new Date(project.createdAt).toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'long',
-                  })}</span>
+                  <span>{project.duration}</span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Eye className="w-4 h-4" />
@@ -396,8 +393,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                                 e.preventDefault();
                                 handleVideoClick(href);
                               }}
-                              className="inline-flex items-center gap-1 text-accent hover:underline cursor-pointer"
+                              className="inline-flex items-center gap-2 px-4 py-2 my-2 rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 hover:border-accent/50 transition-all cursor-pointer font-medium"
                             >
+                              <Play className="w-4 h-4" fill="currentColor" />
                               {children}
                             </button>
                           );
@@ -406,6 +404,26 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                           <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline" {...props}>
                             {children}
                           </a>
+                        );
+                      },
+                      img: ({ node, src, alt, ...props }) => {
+                        const isVideo = src && /\.(mp4|webm|ogg|mov)$/i.test(src);
+                        if (isVideo) {
+                          return (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleVideoClick(src);
+                              }}
+                              className="inline-flex items-center gap-2 px-4 py-2 my-2 rounded-lg bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 hover:border-accent/50 transition-all cursor-pointer font-medium"
+                            >
+                              <Play className="w-4 h-4" fill="currentColor" />
+                              {alt || '영상 보기'}
+                            </button>
+                          );
+                        }
+                        return (
+                          <img src={src} alt={alt} className="rounded-lg max-w-full h-auto my-4" {...props} />
                         );
                       },
                       p: ({ children }) => <p className="leading-relaxed mb-3">{children}</p>,

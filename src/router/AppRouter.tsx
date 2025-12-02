@@ -200,7 +200,7 @@ export const AppRouter = () => {
           {/* 정의되지 않은 모든 경로는 404로 리다이렉트 */}
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
-      </Suspense>
+    </Suspense>
   );
 };
 

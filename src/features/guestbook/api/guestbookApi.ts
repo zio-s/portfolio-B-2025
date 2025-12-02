@@ -18,12 +18,12 @@ import type {
 } from '../types/Guestbook';
 import { transformGuestbookFromDB } from '../types/Guestbook';
 
-const TAG_TYPES = { GUESTBOOK: 'Guestbook' } as const;
+const TAG_TYPES = { GUESTBOOK: 'Guestbook', VISITOR_COUNT: 'VisitorCount' } as const;
 
 export const guestbookApi = createApi({
   reducerPath: 'guestbookApi',
   baseQuery: supabaseBaseQuery(),
-  tagTypes: [TAG_TYPES.GUESTBOOK],
+  tagTypes: [TAG_TYPES.GUESTBOOK, TAG_TYPES.VISITOR_COUNT],
 
   endpoints: (builder) => ({
     /**
@@ -286,7 +286,7 @@ export const guestbookApi = createApi({
 
         return { data: data?.visitor_count || 0 };
       },
-      // Optimize caching - visitor count changes infrequently
+      providesTags: [TAG_TYPES.VISITOR_COUNT],
       keepUnusedDataFor: 3600, // 1 hour cache
     }),
 
@@ -335,6 +335,7 @@ export const guestbookApi = createApi({
           return { data: 1 };
         }
       },
+      invalidatesTags: [TAG_TYPES.VISITOR_COUNT],
     }),
   }),
 });

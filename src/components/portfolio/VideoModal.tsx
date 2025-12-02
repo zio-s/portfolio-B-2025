@@ -110,6 +110,8 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           src={videoUrl}
           controls
           controlsList="nodownload"
+          muted
+          playsInline
           className="w-full rounded-xl shadow-2xl ring-1 ring-white/10"
           preload="auto"
         >

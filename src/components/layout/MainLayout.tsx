@@ -5,6 +5,8 @@
  */
 
 import * as React from 'react';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppSelector, selectUser } from '@/store';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
 import { Footer } from '@/components/layout/Footer';
@@ -38,13 +40,26 @@ const publicMenuItems: MenuItem[] = [
   },
 ];
 
+/** 페이지 전환 애니메이션 설정 */
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const pageTransition = {
+  duration: 0.3,
+  ease: 'easeInOut',
+};
+
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  const location = useLocation();
   // Redux Selector 패턴 사용 (Best Practice)
   const user = useAppSelector(selectUser);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* 통합 Header (Public 모드) */}
+      {/* 통합 Header (Public 모드) - 애니메이션 제외 */}
       <Header
         mode="public"
         user={user ? {
@@ -56,10 +71,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         publicMenuItems={publicMenuItems}
       />
 
-      {/* Main Content */}
-      <main className="flex-1 pt-16">
-        {children}
-      </main>
+      {/* Main Content - Fade 애니메이션 적용 */}
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          className="flex-1 pt-16"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={pageTransition}
+        >
+          {children}
+        </motion.main>
+      </AnimatePresence>
 
       {/* Footer */}
       <Footer />
