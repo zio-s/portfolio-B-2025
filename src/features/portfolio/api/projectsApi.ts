@@ -21,7 +21,7 @@ import type {
  * Supabase Row → Frontend Project 변환
  * snake_case → camelCase
  */
-const transformProject = (row: Database['public']['Tables']['projects']['Row']): Project => ({
+const transformProject = (row: Database['public']['Tables']['projects']['Row'] & { sort_order?: number }): Project => ({
   id: row.id,
   title: row.title,
   description: row.description,
@@ -49,6 +49,7 @@ const transformProject = (row: Database['public']['Tables']['projects']['Row']):
   createdAt: row.created_at ?? new Date().toISOString(),
   updatedAt: row.updated_at ?? new Date().toISOString(),
   authorId: 'system',
+  sortOrder: row.sort_order ?? 0,
 });
 
 const TAG_TYPES = {
@@ -87,13 +88,17 @@ export const projectsApi = createApi({
           }
 
           // Sorting - map sort preset to database columns
-          const sortOption = actualFilters.sort || 'recent';
+          const sortOption = actualFilters.sort || 'default';
           let sortBy: string;
           let ascending: boolean;
 
           switch (sortOption) {
+            case 'default':
+              sortBy = 'sort_order';
+              ascending = true;
+              break;
             case 'recent':
-              sortBy = 'created_at';
+              sortBy = 'start_date';
               ascending = false;
               break;
             case 'popular':
@@ -109,8 +114,8 @@ export const projectsApi = createApi({
               ascending = false;
               break;
             default:
-              sortBy = 'created_at';
-              ascending = false;
+              sortBy = 'sort_order';
+              ascending = true;
           }
 
           query = query.order(sortBy, { ascending });
@@ -669,6 +674,45 @@ export const projectsApi = createApi({
         { type: TAG_TYPES.PROJECT, id: projectId },
       ],
     }),
+
+    /**
+     * 프로젝트 정렬 순서 업데이트 (Admin)
+     */
+    updateProjectsOrder: builder.mutation<void, { id: string; sortOrder: number }[]>({
+      async queryFn(updates) {
+        try {
+          // 각 프로젝트의 sort_order를 업데이트
+          for (const { id, sortOrder } of updates) {
+            const { error } = await supabase
+              .from('projects')
+              .update({ sort_order: sortOrder })
+              .eq('id', id);
+
+            if (error) {
+              return {
+                error: {
+                  status: 400,
+                  data: { message: error.message },
+                },
+              };
+            }
+          }
+
+          return { data: undefined };
+        } catch (error: unknown) {
+          const errorMessage = error && typeof error === 'object' && 'message' in error && typeof (error as { message?: string }).message === 'string'
+            ? (error as { message: string }).message
+            : 'Unknown error occurred';
+          return {
+            error: {
+              status: 500,
+              data: { message: errorMessage },
+            },
+          };
+        }
+      },
+      invalidatesTags: [{ type: TAG_TYPES.PROJECT, id: 'LIST' }],
+    }),
   }),
 });
 
@@ -686,4 +730,5 @@ export const {
   useUnlikeProjectMutation,
   useGetCommentsQuery,
   useCreateCommentMutation,
+  useUpdateProjectsOrderMutation,
 } = projectsApi;

@@ -14,6 +14,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AppRouter } from './router';
 import { ToastContainer } from './components/toast';
 import { ModalContainer } from './components/modal';
+import { ScrollToTop } from './components/common/ScrollToTop';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAppDispatch, getCurrentUser, clearAuth, setCredentials } from './store';
 import { supabase } from './lib/supabase';
@@ -125,6 +126,9 @@ function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        {/* 페이지 전환 시 스크롤 최상단 이동 */}
+        <ScrollToTop />
+
         {/* 메인 라우터 */}
         <AppRouter />
 

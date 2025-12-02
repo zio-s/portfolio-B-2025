@@ -54,6 +54,7 @@ export interface Project {
   status: ProjectStatus;
   featured: boolean; // 메인 페이지에 강조 표시
   stats: ProjectStats;
+  sortOrder: number; // 정렬 순서
   createdAt: string;
   updatedAt: string;
   authorId: string;
@@ -71,7 +72,7 @@ export interface ProjectFilters {
   search?: string; // 제목, 설명 검색
   page?: number;
   limit?: number;
-  sort?: 'recent' | 'popular' | 'views' | 'likes';
+  sort?: 'default' | 'recent' | 'popular' | 'views' | 'likes';
 }
 
 /**

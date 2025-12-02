@@ -112,6 +112,8 @@ export type Database = {
           likes: number | null
           role: string
           solutions: string[] | null
+          sort_order: number | null
+          start_date: string | null
           tags: string[] | null
           team_size: number
           tech_stack: string[] | null
@@ -136,6 +138,8 @@ export type Database = {
           likes?: number | null
           role: string
           solutions?: string[] | null
+          sort_order?: number | null
+          start_date?: string | null
           tags?: string[] | null
           team_size: number
           tech_stack?: string[] | null
@@ -160,6 +164,8 @@ export type Database = {
           likes?: number | null
           role?: string
           solutions?: string[] | null
+          sort_order?: number | null
+          start_date?: string | null
           tags?: string[] | null
           team_size?: number
           tech_stack?: string[] | null

@@ -6,9 +6,10 @@
  */
 
 import { useState } from 'react';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useGetProjectsQuery } from '../features/portfolio/api/projectsApi';
-import type { ProjectCategory } from '../features/portfolio/types/Project';
+import type { ProjectCategory, ProjectFilters } from '../features/portfolio/types/Project';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import { ProjectCard } from '@/components/portfolio/ProjectCard';
 import { Tooltip } from '@/components/ui/tooltip';
 import { Pagination } from '@/components/common/Pagination';
 import { SEO } from '@/components/common/SEO';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 
 const CATEGORIES: Array<{ value: ProjectCategory | undefined; label: string }> = [
   { value: undefined, label: '전체' },
@@ -24,13 +25,24 @@ const CATEGORIES: Array<{ value: ProjectCategory | undefined; label: string }> =
   { value: 'mobile', label: 'Mobile' },
 ];
 
+type SortOption = NonNullable<ProjectFilters['sort']>;
+
+const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
+  { value: 'default', label: '추천순' },
+  { value: 'recent', label: '최신순' },
+  { value: 'views', label: '조회순' },
+  { value: 'likes', label: '인기순' },
+];
+
 export const ProjectsPage = () => {
   const [category, setCategory] = useState<ProjectCategory | undefined>();
+  const [sort, setSort] = useState<SortOption>('recent');
   const [page, setPage] = useState(1);
 
   // RTK Query로 프로젝트 목록 조회
   const { data, isLoading, error } = useGetProjectsQuery({
     category,
+    sort,
     page,
     limit: 6,
   });
@@ -38,6 +50,11 @@ export const ProjectsPage = () => {
   // 필터 변경 시 페이지 초기화
   const handleCategoryChange = (newCategory: ProjectCategory | undefined) => {
     setCategory(newCategory);
+    setPage(1);
+  };
+
+  const handleSortChange = (newSort: SortOption) => {
+    setSort(newSort);
     setPage(1);
   };
 
@@ -66,26 +83,47 @@ export const ProjectsPage = () => {
             </p>
           </div>
 
-          {/* Filters - Simple horizontal tabs */}
-          <div className="flex flex-wrap items-center gap-2 mb-12 pb-6 border-b border-border">
-            {CATEGORIES.map(({ value, label }, index) => (
-              <Tooltip
-                key={label}
-                content={value ? `${label} 프로젝트 보기` : '전체 프로젝트 보기'}
-                position={index % 2 === 0 ? 'top' : 'bottom'}
-              >
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-12 pb-6 border-b border-border">
+            {/* Category filters */}
+            <div className="flex items-center gap-2">
+              {CATEGORIES.map(({ value, label }, index) => (
+                <Tooltip
+                  key={label}
+                  content={value ? `${label} 프로젝트 보기` : '전체 프로젝트 보기'}
+                  position={index % 2 === 0 ? 'top' : 'bottom'}
+                >
+                  <button
+                    onClick={() => handleCategoryChange(value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                      category === value
+                        ? 'bg-accent text-white shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                </Tooltip>
+              ))}
+            </div>
+
+            {/* Sort filters */}
+            <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
+              {SORT_OPTIONS.map(({ value, label }) => (
                 <button
-                  onClick={() => handleCategoryChange(value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                    category === value
-                      ? 'bg-accent text-white'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-card'
+                  key={value}
+                  onClick={() => handleSortChange(value)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all cursor-pointer rounded-md ${
+                    sort === value
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
+                  {sort === value && <Check className="w-3 h-3" />}
                   {label}
                 </button>
-              </Tooltip>
-            ))}
+              ))}
+            </div>
           </div>
         </Container>
       </Section>
@@ -120,23 +158,42 @@ export const ProjectsPage = () => {
       {data && data.items.length > 0 && (
         <Section className="py-12 bg-background">
           <Container>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {data.items.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  id={project.id}
-                  title={project.title}
-                  description={project.description}
-                  thumbnail={project.thumbnail}
-                  tags={[project.category]}
-                  techStack={project.techStack}
-                  githubUrl={project.githubUrl}
-                  liveUrl={project.liveUrl}
-                  stats={project.stats}
-                  featured={project.featured}
-                />
-              ))}
-            </div>
+            <LayoutGroup>
+              <motion.div
+                className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+                layout
+              >
+                <AnimatePresence mode="popLayout">
+                  {data.items.map((project) => (
+                    <motion.div
+                      key={project.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{
+                        layout: { type: 'spring', stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 },
+                        scale: { duration: 0.2 },
+                      }}
+                    >
+                      <ProjectCard
+                        id={project.id}
+                        title={project.title}
+                        description={project.description}
+                        thumbnail={project.thumbnail}
+                        tags={[project.category]}
+                        techStack={project.techStack}
+                        githubUrl={project.githubUrl}
+                        liveUrl={project.liveUrl}
+                        stats={project.stats}
+                        featured={project.featured}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            </LayoutGroup>
 
             {/* Pagination */}
             {data.pagination.totalPages > 1 && (
@@ -166,6 +223,7 @@ export const ProjectsPage = () => {
                 variant="outline"
                 onClick={() => {
                   setCategory(undefined);
+                  setSort('recent');
                   setPage(1);
                 }}
               >
