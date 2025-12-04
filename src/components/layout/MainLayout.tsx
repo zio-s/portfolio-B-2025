@@ -49,7 +49,7 @@ const pageVariants = {
 
 const pageTransition = {
   duration: 0.3,
-  ease: 'easeInOut',
+  ease: 'easeInOut' as const,
 };
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
