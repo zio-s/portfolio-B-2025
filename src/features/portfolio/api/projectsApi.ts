@@ -21,7 +21,7 @@ import type {
  * Supabase Row → Frontend Project 변환
  * snake_case → camelCase
  */
-const transformProject = (row: Database['public']['Tables']['projects']['Row'] & { sort_order?: number }): Project => ({
+const transformProject = (row: Database['public']['Tables']['projects']['Row']): Project => ({
   id: row.id,
   title: row.title,
   description: row.description,
