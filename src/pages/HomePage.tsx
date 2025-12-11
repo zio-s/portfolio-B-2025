@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { ProjectCard } from '@/components/portfolio/ProjectCard';
 import { SEO } from '@/components/common/SEO';
+import { ProfilePageJsonLd } from '@/components/common/JsonLd';
 import {useGetProjectsQuery} from "@/features/portfolio/api/projectsApi.ts";
 import {useGetGuestbookQuery} from "@/features/guestbook/api/guestbookApi.ts";
 import {useGetPostsQuery} from "@/store";
@@ -157,6 +158,14 @@ const HomePage = () => {
   return (
     <MainLayout>
       <SEO />
+
+      {/* JSON-LD 구조화 데이터 - 홈페이지용 ProfilePage 스키마 */}
+      <ProfilePageJsonLd
+        url="https://semincode.com"
+        title="변세민 | 프론트엔드 개발자 포트폴리오"
+        description="프론트엔드 개발자 변세민의 포트폴리오입니다. React, TypeScript, Redux를 활용한 웹 애플리케이션 개발 프로젝트를 소개합니다."
+      />
+
       {/* Hero Section with Parallax & 3D */}
       <motion.section
         ref={heroRef}

@@ -48,18 +48,80 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Structured Data for SEO -->
+    <!-- Structured Data for SEO - WebSite Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://semincode.com/#website",
+      "name": "변세민 포트폴리오",
+      "alternateName": "SeminCode",
+      "url": "https://semincode.com",
+      "description": "프론트엔드 개발자 변세민의 포트폴리오입니다. React, TypeScript, Redux를 활용한 웹 애플리케이션 개발 프로젝트를 소개합니다.",
+      "inLanguage": "ko-KR",
+      "publisher": {
+        "@id": "https://semincode.com/#person"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://semincode.com/blog?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data for SEO - Person Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Person",
+      "@id": "https://semincode.com/#person",
       "name": "변세민",
       "alternateName": "Semin Byun",
       "jobTitle": "프론트엔드 개발자",
-      "description": "React, TypeScript를 활용한 프론트엔드 개발자",
-      "knowsAbout": ["React", "TypeScript", "Redux", "JavaScript", "Web Development"],
+      "description": "프론트엔드 개발자 - React, TypeScript 전문",
       "url": "https://semincode.com",
-      "image": "/android-chrome-512x512.png"
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://semincode.com/android-chrome-512x512.png",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [
+        "https://github.com/semin-B"
+      ],
+      "knowsAbout": ["React", "TypeScript", "JavaScript", "Redux", "Next.js", "Tailwind CSS", "Web Development", "Frontend Development"],
+      "worksFor": {
+        "@type": "Organization",
+        "name": "SeminCode"
+      }
+    }
+    </script>
+
+    <!-- Structured Data for SEO - Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://semincode.com/#organization",
+      "name": "SeminCode",
+      "url": "https://semincode.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://semincode.com/android-chrome-512x512.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "프론트엔드 개발자 변세민의 포트폴리오입니다.",
+      "founder": {
+        "@id": "https://semincode.com/#person"
+      },
+      "sameAs": [
+        "https://github.com/semin-B"
+      ]
     }
     </script>
   </body>
