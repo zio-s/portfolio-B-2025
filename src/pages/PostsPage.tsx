@@ -22,6 +22,7 @@ import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
+import { CollectionPageJsonLd, BreadcrumbJsonLd } from '@/components/common/JsonLd';
 import { useAlertModal, useConfirmModal } from '@/components/modal/hooks';
 import {
   PenSquare,
@@ -142,8 +143,23 @@ const PostsPage = () => {
   return (
     <MainLayout>
       <SEO
-        title="게시글 목록 | Blog"
-        description="모든 블로그 게시글을 한눈에 확인하세요"
+        title="블로그 | 변세민 | 프론트엔드 개발자"
+        description="프론트엔드 개발자 변세민의 기술 블로그입니다. React, TypeScript, 웹 개발 관련 글을 공유합니다."
+        url="https://semincode.com/blog"
+      />
+
+      {/* JSON-LD 구조화 데이터 */}
+      <CollectionPageJsonLd
+        url="https://semincode.com/blog"
+        title="블로그 | 변세민 | 프론트엔드 개발자"
+        description="프론트엔드 개발자 변세민의 기술 블로그입니다. React, TypeScript, 웹 개발 관련 글을 공유합니다."
+      />
+
+      <BreadcrumbJsonLd
+        items={[
+          { name: '홈', url: '/' },
+          { name: '블로그', url: '/blog' },
+        ]}
       />
 
       {/* Header */}

@@ -28,6 +28,7 @@ import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SEO } from '@/components/common/SEO';
+import { ArticleJsonLd, BreadcrumbJsonLd } from '@/components/common/JsonLd';
 import { PostCommentList } from '@/features/post-comments/components/PostCommentList';
 import { PostCommentForm } from '@/features/post-comments/components/PostCommentForm';
 import { useAlertModal, useConfirmModal } from '@/components/modal/hooks';
@@ -244,7 +245,31 @@ const PostDetailPage = () => {
     <MainLayout>
       <SEO
         title={`${post.title} | Blog`}
-        description={post.excerpt}
+        description={post.excerpt || post.content.slice(0, 160)}
+        url={`https://semincode.com/blog/${post.id}`}
+        type="article"
+        publishedTime={post.publishedAt || post.createdAt}
+        modifiedTime={post.updatedAt}
+      />
+
+      {/* JSON-LD 구조화 데이터 - 구글 리치 결과용 */}
+      <ArticleJsonLd
+        title={post.title}
+        description={post.excerpt || post.content.slice(0, 160)}
+        url={`https://semincode.com/blog/${post.id}`}
+        datePublished={post.publishedAt || post.createdAt}
+        dateModified={post.updatedAt}
+        keywords={post.tags}
+        articleBody={post.content}
+      />
+
+      {/* 브레드크럼 - 구글 검색에서 경로 표시 */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: '홈', url: '/' },
+          { name: '블로그', url: '/blog' },
+          { name: post.title, url: `/blog/${post.id}` },
+        ]}
       />
 
       {/* Back Button */}
