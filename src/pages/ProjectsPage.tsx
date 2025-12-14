@@ -37,7 +37,7 @@ const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
 
 export const ProjectsPage = () => {
   const [category, setCategory] = useState<ProjectCategory | undefined>();
-  const [sort, setSort] = useState<SortOption>('recent');
+  const [sort, setSort] = useState<SortOption>('default');
   const [page, setPage] = useState(1);
 
   // RTK Query로 프로젝트 목록 조회

@@ -3,27 +3,10 @@
  *
  * 프로젝트 관리 페이지 (관리자 전용)
  * h-creations.com 스타일의 미니멀한 디자인
- * 드래그 앤 드롭으로 프로젝트 순서 변경 지원
+ * 클릭으로 순번 변경 지원
  */
 
-import { useState, useMemo } from 'react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { AdminLayout } from '../../components/layout/AdminLayout';
 import { ProjectForm } from '../../components/admin/ProjectForm';
 import { useAlertModal } from '@/components/modal/hooks/use-alert-modal';
@@ -36,72 +19,133 @@ import {
   useCreateProjectMutation,
   useUpdateProjectsOrderMutation,
 } from '../../features/portfolio/api/projectsApi';
-import { Loader2, Plus, Edit2, Trash2, Star, Eye, Heart, MessageCircle, GripVertical } from 'lucide-react';
+import { Loader2, Plus, Edit2, Trash2, Star, Eye, Heart, MessageCircle } from 'lucide-react';
 
 /**
- * Sortable Table Row Component
+ * 순번 편집 Input 컴포넌트
  */
-interface SortableRowProps {
-  project: Project;
-  onEdit: (project: Project) => void;
-  onDelete: (id: string, title: string) => void;
-  onToggleFeatured: (id: string, featured: boolean) => void;
+interface OrderInputProps {
+  currentOrder: number;
+  maxOrder: number;
+  onSave: (newOrder: number) => void;
+  onCancel: () => void;
 }
 
-const SortableRow = ({ project, onEdit, onDelete, onToggleFeatured }: SortableRowProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: project.id });
+const OrderInput = ({ currentOrder, maxOrder, onSave, onCancel }: OrderInputProps) => {
+  const [value, setValue] = useState(String(currentOrder));
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : 0,
+  useEffect(() => {
+    inputRef.current?.select();
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      const num = parseInt(value, 10);
+      if (!isNaN(num) && num >= 1 && num <= maxOrder) {
+        onSave(num);
+      }
+    } else if (e.key === 'Escape') {
+      onCancel();
+    }
+  };
+
+  const handleBlur = () => {
+    const num = parseInt(value, 10);
+    if (!isNaN(num) && num >= 1 && num <= maxOrder) {
+      onSave(num);
+    } else {
+      onCancel();
+    }
   };
 
   return (
-    <tr
-      ref={setNodeRef}
-      style={style}
-      className={`hover:bg-muted/30 transition-colors ${isDragging ? 'bg-muted/50' : ''}`}
-    >
-      {/* Drag Handle */}
-      <td className="px-3 py-4 w-10">
-        <button
-          {...attributes}
-          {...listeners}
-          className="p-1 rounded hover:bg-muted cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
-          title="드래그하여 순서 변경"
-        >
-          <GripVertical className="w-4 h-4" />
-        </button>
-      </td>
+    <div className="flex items-center gap-1">
+      <input
+        ref={inputRef}
+        type="number"
+        min={1}
+        max={maxOrder}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
+        className="w-12 h-8 text-center text-sm border border-accent rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent"
+        autoFocus
+      />
+    </div>
+  );
+};
+
+/**
+ * Table Row Component
+ */
+interface TableRowProps {
+  project: Project;
+  order: number;
+  maxOrder: number;
+  isEditingOrder: boolean;
+  onEdit: (project: Project) => void;
+  onDelete: (id: string, title: string) => void;
+  onToggleFeatured: (id: string, featured: boolean) => void;
+  onOrderClick: () => void;
+  onOrderSave: (newOrder: number) => void;
+  onOrderCancel: () => void;
+}
+
+const TableRow = ({
+  project,
+  order,
+  maxOrder,
+  isEditingOrder,
+  onEdit,
+  onDelete,
+  onToggleFeatured,
+  onOrderClick,
+  onOrderSave,
+  onOrderCancel,
+}: TableRowProps) => {
+  return (
+    <div className="grid grid-cols-[60px_1fr_100px_100px_120px_100px] items-center border-b border-border hover:bg-muted/30 transition-all">
+      {/* Order Number */}
+      <div className="px-3 py-4 text-center">
+        {isEditingOrder ? (
+          <OrderInput
+            currentOrder={order}
+            maxOrder={maxOrder}
+            onSave={onOrderSave}
+            onCancel={onOrderCancel}
+          />
+        ) : (
+          <button
+            onClick={onOrderClick}
+            className="w-10 h-8 inline-flex items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-md transition-colors border border-transparent hover:border-accent/30"
+            title="클릭하여 순번 변경"
+          >
+            {order}
+          </button>
+        )}
+      </div>
 
       {/* Title & Description */}
-      <td className="px-6 py-4">
+      <div className="px-4 py-4">
         <div className="max-w-md">
           <div className="font-semibold text-sm mb-1">{project.title}</div>
           <div className="text-xs text-muted-foreground line-clamp-2">
             {project.description}
           </div>
         </div>
-      </td>
+      </div>
 
       {/* Category */}
-      <td className="px-6 py-4">
+      <div className="px-4 py-4">
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-accent/10 text-accent border border-accent/20">
           {project.category}
         </span>
-      </td>
+      </div>
 
       {/* Featured Toggle */}
-      <td className="px-6 py-4 text-center">
+      <div className="px-4 py-4 text-center">
         <button
           onClick={() => onToggleFeatured(project.id, project.featured)}
           className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
@@ -115,10 +159,10 @@ const SortableRow = ({ project, onEdit, onDelete, onToggleFeatured }: SortableRo
           />
           {project.featured ? 'YES' : 'NO'}
         </button>
-      </td>
+      </div>
 
       {/* Stats */}
-      <td className="px-6 py-4">
+      <div className="px-4 py-4">
         <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Eye className="w-3 h-3" />
@@ -133,10 +177,10 @@ const SortableRow = ({ project, onEdit, onDelete, onToggleFeatured }: SortableRo
             {project.stats.comments}
           </span>
         </div>
-      </td>
+      </div>
 
       {/* Actions */}
-      <td className="px-6 py-4">
+      <div className="px-4 py-4">
         <div className="flex items-center justify-center gap-2">
           <button
             onClick={() => onEdit(project)}
@@ -153,47 +197,59 @@ const SortableRow = ({ project, onEdit, onDelete, onToggleFeatured }: SortableRo
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </td>
-    </tr>
+      </div>
+    </div>
   );
 };
 
 /**
- * Sortable Mobile Card Component
+ * Mobile Card Component
  */
-const SortableMobileCard = ({ project, onEdit, onDelete, onToggleFeatured }: SortableRowProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: project.id });
+interface MobileCardProps {
+  project: Project;
+  order: number;
+  maxOrder: number;
+  isEditingOrder: boolean;
+  onEdit: (project: Project) => void;
+  onDelete: (id: string, title: string) => void;
+  onToggleFeatured: (id: string, featured: boolean) => void;
+  onOrderClick: () => void;
+  onOrderSave: (newOrder: number) => void;
+  onOrderCancel: () => void;
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : 0,
-  };
-
+const MobileCard = ({
+  project,
+  order,
+  maxOrder,
+  isEditingOrder,
+  onEdit,
+  onDelete,
+  onToggleFeatured,
+  onOrderClick,
+  onOrderSave,
+  onOrderCancel,
+}: MobileCardProps) => {
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`p-4 rounded-lg border border-border bg-card space-y-3 ${isDragging ? 'shadow-lg' : ''}`}
-    >
-      {/* Header with Drag Handle */}
+    <div className="p-4 rounded-lg border bg-card border-border space-y-3">
+      {/* Header with Order */}
       <div className="flex items-start justify-between gap-2">
-        <button
-          {...attributes}
-          {...listeners}
-          className="p-1 rounded hover:bg-muted cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
-          title="드래그하여 순서 변경"
-        >
-          <GripVertical className="w-4 h-4" />
-        </button>
+        {isEditingOrder ? (
+          <OrderInput
+            currentOrder={order}
+            maxOrder={maxOrder}
+            onSave={onOrderSave}
+            onCancel={onOrderCancel}
+          />
+        ) : (
+          <button
+            onClick={onOrderClick}
+            className="w-10 h-8 inline-flex items-center justify-center text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-md transition-colors border border-muted hover:border-accent/30 flex-shrink-0"
+            title="클릭하여 순번 변경"
+          >
+            {order}
+          </button>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm mb-1 truncate">{project.title}</h3>
           <p className="text-xs text-muted-foreground line-clamp-2">
@@ -263,7 +319,7 @@ const SortableMobileCard = ({ project, onEdit, onDelete, onToggleFeatured }: Sor
 export const AdminProjectsPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [localProjects, setLocalProjects] = useState<Project[]>([]);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const { showAlert } = useAlertModal();
   const { showConfirm } = useConfirmModal();
 
@@ -274,69 +330,44 @@ export const AdminProjectsPage = () => {
   const [createProject] = useCreateProjectMutation();
   const [updateProjectsOrder, { isLoading: isSavingOrder }] = useUpdateProjectsOrderMutation();
 
-  // Sync local state with fetched data
-  const projects = useMemo(() => {
-    if (data?.items && localProjects.length === 0) {
-      return data.items;
-    }
-    return localProjects.length > 0 ? localProjects : (data?.items || []);
-  }, [data?.items, localProjects]);
+  // Projects list
+  const projects = useMemo(() => data?.items || [], [data?.items]);
 
-  // Update local state when data changes
-  useMemo(() => {
-    if (data?.items && localProjects.length === 0) {
-      setLocalProjects(data.items);
-    }
-  }, [data?.items]);
+  // Handle order change
+  const handleOrderChange = async (projectId: string, newOrder: number) => {
+    setEditingOrderId(null);
 
-  // DnD sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+    const currentIndex = projects.findIndex(p => p.id === projectId);
+    if (currentIndex === -1) return;
 
-  // Project IDs for sortable context
-  const projectIds = useMemo(() => projects.map(p => p.id), [projects]);
+    const targetIndex = newOrder - 1; // 1-based to 0-based index
 
-  // Handle drag end
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
+    if (currentIndex === targetIndex) return; // No change needed
 
-    if (over && active.id !== over.id) {
-      const oldIndex = projects.findIndex(p => p.id === active.id);
-      const newIndex = projects.findIndex(p => p.id === over.id);
+    // Reorder projects
+    const newProjects = [...projects];
+    const [movedProject] = newProjects.splice(currentIndex, 1);
+    newProjects.splice(targetIndex, 0, movedProject);
 
-      const newProjects = arrayMove(projects, oldIndex, newIndex);
-      setLocalProjects(newProjects);
+    // Update sort_order in database
+    const updates = newProjects.map((project, index) => ({
+      id: project.id,
+      sortOrder: index,
+    }));
 
-      // Update sort_order in database
-      const updates = newProjects.map((project, index) => ({
-        id: project.id,
-        sortOrder: index,
-      }));
-
-      try {
-        await updateProjectsOrder(updates).unwrap();
-        showAlert({
-          title: '순서 저장',
-          message: '프로젝트 순서가 저장되었습니다.',
-          type: 'success',
-        });
-      } catch {
-        // Revert on error
-        setLocalProjects(data?.items || []);
-        showAlert({
-          title: '순서 저장 실패',
-          message: '프로젝트 순서 저장에 실패했습니다.',
-          type: 'error',
-        });
-      }
+    try {
+      await updateProjectsOrder(updates).unwrap();
+      showAlert({
+        title: '순서 저장',
+        message: `프로젝트가 ${newOrder}번으로 이동되었습니다.`,
+        type: 'success',
+      });
+    } catch {
+      showAlert({
+        title: '순서 저장 실패',
+        message: '프로젝트 순서 저장에 실패했습니다.',
+        type: 'error',
+      });
     }
   };
 
@@ -399,12 +430,12 @@ export const AdminProjectsPage = () => {
     setIsFormOpen(true);
   };
 
-  const handleFormSubmit = async (data: Partial<Project>) => {
+  const handleFormSubmit = async (formData: Partial<Project>) => {
     try {
       if (editingProject) {
         await updateProject({
           id: editingProject.id,
-          ...data,
+          ...formData,
         }).unwrap();
 
         showAlert({
@@ -413,7 +444,7 @@ export const AdminProjectsPage = () => {
           type: 'success',
         });
       } else {
-        await createProject(data as Parameters<typeof createProject>[0]).unwrap();
+        await createProject(formData as Parameters<typeof createProject>[0]).unwrap();
 
         showAlert({
           title: '생성 완료',
@@ -487,68 +518,74 @@ export const AdminProjectsPage = () => {
           </div>
         )}
 
-        {/* Drag and Drop Context */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={projectIds} strategy={verticalListSortingStrategy}>
-            {/* Projects Table - Desktop */}
-            <div className="hidden md:block overflow-hidden rounded-lg border border-border bg-card">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/50">
-                      <th className="px-3 py-3 w-10 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        순서
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        제목
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        카테고리
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Featured
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        통계
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        관리
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {projects.map((project) => (
-                      <SortableRow
-                        key={project.id}
-                        project={project}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onToggleFeatured={toggleFeatured}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        {/* Order Edit Help */}
+        <div className="p-3 rounded-lg bg-muted/50 border border-border">
+          <p className="text-xs text-muted-foreground">
+            💡 <strong>순번 변경:</strong> 왼쪽 숫자를 클릭하면 순번을 직접 입력할 수 있습니다. (1 ~ {projects.length})
+          </p>
+        </div>
 
-            {/* Projects Cards - Mobile */}
-            <div className="md:hidden space-y-4">
-              {projects.map((project) => (
-                <SortableMobileCard
-                  key={project.id}
-                  project={project}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleFeatured={toggleFeatured}
-                />
-              ))}
+        {/* Projects Grid - Desktop */}
+        <div className="hidden md:block overflow-hidden rounded-lg border border-border bg-card">
+          {/* Header */}
+          <div className="grid grid-cols-[60px_1fr_100px_100px_120px_100px] items-center border-b border-border bg-muted/50">
+            <div className="px-3 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">
+              순번
             </div>
-          </SortableContext>
-        </DndContext>
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              제목
+            </div>
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              카테고리
+            </div>
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">
+              Featured
+            </div>
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">
+              통계
+            </div>
+            <div className="px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center">
+              관리
+            </div>
+          </div>
+          {/* Body */}
+          <div>
+            {projects.map((project, index) => (
+              <TableRow
+                key={project.id}
+                project={project}
+                order={index + 1}
+                maxOrder={projects.length}
+                isEditingOrder={editingOrderId === project.id}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleFeatured={toggleFeatured}
+                onOrderClick={() => setEditingOrderId(project.id)}
+                onOrderSave={(newOrder) => handleOrderChange(project.id, newOrder)}
+                onOrderCancel={() => setEditingOrderId(null)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Projects Cards - Mobile */}
+        <div className="md:hidden space-y-4">
+          {projects.map((project, index) => (
+            <MobileCard
+              key={project.id}
+              project={project}
+              order={index + 1}
+              maxOrder={projects.length}
+              isEditingOrder={editingOrderId === project.id}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleFeatured={toggleFeatured}
+              onOrderClick={() => setEditingOrderId(project.id)}
+              onOrderSave={(newOrder) => handleOrderChange(project.id, newOrder)}
+              onOrderCancel={() => setEditingOrderId(null)}
+            />
+          ))}
+        </div>
 
         {/* Total Count */}
         <div className="text-sm text-muted-foreground">

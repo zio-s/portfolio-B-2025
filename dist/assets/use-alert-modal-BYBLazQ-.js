@@ -1,1 +1,0 @@
-import{r as e}from"./vendor-react-DXenhPTK.js";import{m as o}from"./index-AbUhRBzW.js";function c(){const t=e.useCallback(r=>o.alert(r),[]),a=e.useCallback(r=>{o.close(r)},[]);return{showAlert:t,closeAlert:a}}export{c as u};
