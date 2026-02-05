@@ -51,14 +51,12 @@ export const AuthLayout = ({
         <div className="auth-layout__header">
           {/* 로고 */}
           <div className="auth-layout__logo">
-            <svg
+            <img
+              src="/logo.png"
+              alt="FD Logo"
               className="auth-layout__logo-icon"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18.5c-4.28-1.05-7.5-5.28-7.5-9.5V8.3l7.5-3.75L19.5 8.3V11c0 4.22-3.22 8.45-7.5 9.5z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+              style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+            />
             <span className="auth-layout__logo-text">{logoText}</span>
           </div>
 
