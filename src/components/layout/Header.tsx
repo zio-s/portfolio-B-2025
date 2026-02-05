@@ -160,12 +160,14 @@ export const Header = ({
           className="header__logo"
           onClick={onLogoClick}
         >
-          <img
-            src="/logo.png"
-            alt="FD Logo"
+          <svg
             className="header__logo-icon"
-            style={{ width: '32px', height: '32px', objectFit: 'contain' }}
-          />
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18.5c-4.28-1.05-7.5-5.28-7.5-9.5V8.3l7.5-3.75L19.5 8.3V11c0 4.22-3.22 8.45-7.5 9.5z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
           <span className="header__logo-text">{logoText}</span>
         </Link>
 
