@@ -75,7 +75,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
 
       // 관리자 전용 닉네임 차단
       const lowerNickname = nickname.trim().toLowerCase();
-      if (lowerNickname === 'admin' || nickname.trim() === 'B.SM' || lowerNickname === 'b.sm') {
+      if (lowerNickname === 'admin' || lowerNickname === 'sem' || nickname.trim() === 'SEM') {
         showAlert({
           title: '사용 불가능한 닉네임',
           message: '해당 닉네임은 관리자 전용입니다.',
@@ -86,7 +86,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
     }
 
     // 욕설 필터 적용
-    const filteredName = isAuthenticated ? 'B.SM' : filterNickname(nickname.trim());
+    const filteredName = isAuthenticated ? 'SEM' : filterNickname(nickname.trim());
     const filteredContent = filterProfanity(commentText.trim());
 
     // 욕설이 감지되었는지 확인
@@ -155,7 +155,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
 
       // 관리자 전용 닉네임 차단
       const lowerReplyNickname = replyNickname.trim().toLowerCase();
-      if (lowerReplyNickname === 'admin' || replyNickname.trim() === 'B.SM' || lowerReplyNickname === 'b.sm') {
+      if (lowerReplyNickname === 'admin' || lowerReplyNickname === 'sem' || replyNickname.trim() === 'SEM') {
         showAlert({
           title: '사용 불가능한 닉네임',
           message: '해당 닉네임은 관리자 전용입니다.',
@@ -166,7 +166,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
     }
 
     // 욕설 필터 적용
-    const filteredName = isAuthenticated ? 'B.SM' : filterNickname(replyNickname.trim());
+    const filteredName = isAuthenticated ? 'SEM' : filterNickname(replyNickname.trim());
     const filteredContent = filterProfanity(replyText.trim());
 
     // 욕설이 감지되었는지 확인
@@ -237,7 +237,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
         {isAuthenticated && (
           <div className="flex items-center gap-2 text-sm text-accent">
             <User className="w-4 h-4" />
-            <span className="font-semibold">B.SM</span>
+            <span className="font-semibold">SEM</span>
             <span className="text-muted-foreground">로 댓글 작성</span>
           </div>
         )}
@@ -287,7 +287,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                     <User className="w-5 h-5 text-muted-foreground" />
                   </div>
-                  {comment.author_name === 'B.SM' && (
+                  {comment.author_name === 'SEM' && (
                     <span className="text-[10px] font-semibold text-accent">admin</span>
                   )}
                 </div>
@@ -295,7 +295,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-1">
-                    <span className={`text-sm font-medium ${comment.author_name === 'B.SM' ? 'text-accent' : ''}`}>
+                    <span className={`text-sm font-medium ${comment.author_name === 'SEM' ? 'text-accent' : ''}`}>
                       {comment.author_name}
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -333,7 +333,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
                       {isAuthenticated && (
                         <div className="flex items-center gap-2 text-xs text-accent">
                           <User className="w-3 h-3" />
-                          <span className="font-semibold">B.SM</span>
+                          <span className="font-semibold">SEM</span>
                           <span className="text-muted-foreground">로 답글 작성</span>
                         </div>
                       )}
@@ -383,7 +383,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
                         <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                           <User className="w-4 h-4 text-muted-foreground" />
                         </div>
-                        {reply.author_name === 'B.SM' && (
+                        {reply.author_name === 'SEM' && (
                           <span className="text-[9px] font-semibold text-accent">admin</span>
                         )}
                       </div>
@@ -391,7 +391,7 @@ export const CommentList: React.FC<CommentListProps> = ({ projectId, className }
                       {/* Reply Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2 mb-1">
-                          <span className={`text-sm font-medium ${reply.author_name === 'B.SM' ? 'text-accent' : ''}`}>
+                          <span className={`text-sm font-medium ${reply.author_name === 'SEM' ? 'text-accent' : ''}`}>
                             {reply.author_name}
                           </span>
                           <span className="text-xs text-muted-foreground">

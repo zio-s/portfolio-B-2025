@@ -60,11 +60,7 @@ export const ProjectsPage = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    const scrollY = window.scrollY;
     setPage(newPage);
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollY);
-    });
   };
 
   return (

@@ -30,8 +30,6 @@ const PostsPage = lazy(() => import('../pages/PostsPage'));
 const PostCreatePage = lazy(() => import('../pages/PostCreatePage'));
 const PostDetailPage = lazy(() => import('../pages/PostDetailPage'));
 const PostEditPage = lazy(() => import('../pages/PostEditPage'));
-const UsersPage = lazy(() => import('../pages/UsersPage'));
-const UserDetailPage = lazy(() => import('../pages/UserDetailPage'));
 const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 
 // Admin 페이지
@@ -129,24 +127,6 @@ export const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* 사용자 관련 라우트 (관리자 전용) */}
-          <Route
-            path={ROUTES.USERS}
-            element={
-              <ProtectedRoute>
-                <UsersPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.USERS_DETAIL}
-            element={
-              <ProtectedRoute>
-                <UserDetailPage />
               </ProtectedRoute>
             }
           />

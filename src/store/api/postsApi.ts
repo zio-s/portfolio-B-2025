@@ -8,12 +8,31 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { supabaseBaseQuery, buildSupabaseQuery } from '../../services/supabaseBaseQuery';
 import type { Post } from '../types';
 
+// API 버전 - API 구조 변경 시 버전 증가하면 캐시 자동 초기화
+const API_VERSION = '2';
+const API_VERSION_KEY = 'posts_api_version';
+const USER_IDENTIFIER_KEY = 'user_identifier';
+
+// 캐시 버전 체크 및 초기화
+const checkAndClearCache = () => {
+  const storedVersion = localStorage.getItem(API_VERSION_KEY);
+  if (storedVersion !== API_VERSION) {
+    // 버전이 다르면 관련 캐시 초기화
+    localStorage.removeItem(USER_IDENTIFIER_KEY);
+    localStorage.setItem(API_VERSION_KEY, API_VERSION);
+    console.log(`[PostsAPI] Cache cleared. Version updated: ${storedVersion} → ${API_VERSION}`);
+  }
+};
+
+// 앱 시작 시 캐시 버전 체크
+checkAndClearCache();
+
 // 사용자 식별자 생성 (IP 대신 브라우저 fingerprint 사용)
 const getUserIdentifier = (): string => {
-  let identifier = localStorage.getItem('user_identifier');
+  let identifier = localStorage.getItem(USER_IDENTIFIER_KEY);
   if (!identifier) {
     identifier = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    localStorage.setItem('user_identifier', identifier);
+    localStorage.setItem(USER_IDENTIFIER_KEY, identifier);
   }
   return identifier;
 };
@@ -28,10 +47,13 @@ export const postsApi = createApi({
     // ========================================
 
     /**
-     * 게시글 목록 조회 (통계 포함)
+     * 게시글 목록 조회 (통계 포함, 페이지네이션 지원)
      */
-    getPosts: builder.query<Post[], { status?: string }>({
-      async queryFn({ status }, _api, _extraOptions, baseQuery) {
+    getPosts: builder.query<
+      { posts: Post[]; totalCount: number; totalPages: number },
+      { status?: string; page?: number; limit?: number }
+    >({
+      async queryFn({ status, page = 1, limit = 10 }, _api, _extraOptions, baseQuery) {
         try {
           // post_stats 뷰에서 조회
           const { data, error } = await baseQuery(
@@ -44,15 +66,20 @@ export const postsApi = createApi({
           if (error) throw error;
 
           // items 배열 추출
-          const posts = (data as any)?.items || [];
+          let posts = (data as any)?.items || [];
+          const totalCount = posts.length;
+          const totalPages = Math.ceil(totalCount / limit);
+
+          // 페이지네이션 적용 (클라이언트 사이드)
+          const startIndex = (page - 1) * limit;
+          posts = posts.slice(startIndex, startIndex + limit);
 
           if (posts.length === 0) {
-            return { data: [] };
+            return { data: { posts: [], totalCount, totalPages } };
           }
 
           // 사용자별 좋아요 상태 확인 - 한 번의 쿼리로 모든 게시글의 좋아요 상태 조회
           const userIdentifier = getUserIdentifier();
-          const postIds = posts.map((post: any) => post.id);
 
           // IN 쿼리로 모든 좋아요 데이터 한 번에 가져오기
           const { data: likeData } = await baseQuery(
@@ -73,7 +100,7 @@ export const postsApi = createApi({
             publishedAt: post.published_at || post.publishedAt,
           }));
 
-          return { data: postsWithLikeStatus };
+          return { data: { posts: postsWithLikeStatus, totalCount, totalPages } };
         } catch (error: any) {
           return { error: { status: 500, data: { message: error.message } } };
         }
@@ -81,7 +108,7 @@ export const postsApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: 'Post' as const, id })),
+              ...result.posts.map(({ id }) => ({ type: 'Post' as const, id })),
               { type: 'Post', id: 'LIST' },
             ]
           : [{ type: 'Post', id: 'LIST' }],

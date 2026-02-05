@@ -1,5 +1,5 @@
 // Store
-export { store, type RootState, type AppDispatch } from './store';
+export { store, resetAllApiState, type RootState, type AppDispatch } from './store';
 
 // Hooks
 export { useAppDispatch, useAppSelector, useRedux } from './hooks';

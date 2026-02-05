@@ -128,7 +128,7 @@ export const AdminGuestbookPage = () => {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Guestbook</h1>
+          <h1 className="text-3xl font-bold tracking-tight">방문록</h1>
           <p className="text-sm text-muted-foreground mt-1">
             방문록을 관리하고 답글을 작성합니다
           </p>

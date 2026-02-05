@@ -227,7 +227,7 @@ export const GuestbookCard: React.FC<GuestbookCardProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-sm text-accent">리오짱</span>
+                  <span className="font-semibold text-sm text-accent">SEM</span>
                   <span className="px-2 py-0.5 text-[10px] font-semibold bg-accent/20 text-accent rounded">
                     ADMIN
                   </span>

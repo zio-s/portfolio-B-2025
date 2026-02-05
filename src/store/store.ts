@@ -65,4 +65,15 @@ const initializeTheme = () => {
 
 initializeTheme();
 
+// RTK Query 캐시 초기화 유틸리티
+export const resetAllApiState = () => {
+  store.dispatch(projectsApi.util.resetApiState());
+  store.dispatch(commentsApi.util.resetApiState());
+  store.dispatch(adminApi.util.resetApiState());
+  store.dispatch(guestbookApi.util.resetApiState());
+  store.dispatch(postsApi.util.resetApiState());
+  store.dispatch(postCommentsApi.util.resetApiState());
+  console.log('[Store] All API caches cleared');
+};
+
 export default store;

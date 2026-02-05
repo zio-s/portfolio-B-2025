@@ -36,10 +36,6 @@ export const PROTECTED_ROUTES = {
   BLOG_CREATE: '/blog/create',
   BLOG_EDIT: '/blog/:id/edit',
 
-  /** 사용자 관련 라우트 (관리자 전용) */
-  USERS: '/users',
-  USERS_DETAIL: '/users/:id',
-
   /** 프로필 페이지 */
   PROFILE: '/profile',
 } as const;
@@ -69,13 +65,6 @@ export const routeHelpers = {
    * @returns 게시글 수정 페이지 경로
    */
   blogEdit: (id: string): string => `/blog/${id}/edit`,
-
-  /**
-   * 사용자 상세 페이지 경로 생성
-   * @param id - 사용자 ID
-   * @returns 사용자 상세 페이지 경로
-   */
-  userDetail: (id: string): string => `/users/${id}`,
 } as const;
 
 /**

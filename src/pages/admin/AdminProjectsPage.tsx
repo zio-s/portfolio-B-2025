@@ -157,7 +157,7 @@ const TableRow = ({
           <Star
             className={`w-3 h-3 ${project.featured ? 'fill-current' : ''}`}
           />
-          {project.featured ? 'YES' : 'NO'}
+          {project.featured ? '대표' : '일반'}
         </button>
       </div>
 
@@ -295,7 +295,7 @@ const MobileCard = ({
           }`}
         >
           <Star className={`w-3 h-3 ${project.featured ? 'fill-current' : ''}`} />
-          {project.featured ? 'Featured' : 'Not Featured'}
+          {project.featured ? '대표 프로젝트' : '일반 프로젝트'}
         </button>
         <button
           onClick={() => onEdit(project)}
@@ -487,7 +487,7 @@ export const AdminProjectsPage = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+            <h1 className="text-3xl font-bold tracking-tight">프로젝트</h1>
             <p className="text-sm text-muted-foreground mt-1">
               포트폴리오 프로젝트를 관리합니다
             </p>

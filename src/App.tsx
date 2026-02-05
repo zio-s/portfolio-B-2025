@@ -45,22 +45,13 @@ function App() {
           lastProcessedEmail = session.user.email ?? '';
 
           try {
-            // session.user로 직접 로그인 처리
-            dispatch(setCredentials({
-              user: {
-                id: session.user.id,
-                email: session.user.email || 'admin@admin.com',
-                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Admin',
-                role: UserRole.ADMIN,
-                isActive: true,
-                isEmailVerified: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-              token: session.access_token,
-            }));
+            // getCurrentUser thunk를 사용하여 admin_users에서 정보 가져오기
+            // 이 thunk는 authService.getSession()을 호출하여 admin_users 테이블에서 이름을 가져옴
+            await dispatch(getCurrentUser()).unwrap();
           } catch (err) {
-            // Error in auth state change - silently handled
+            // 실패 시 인증 상태 초기화 (보안: fallback으로 인증 허용하지 않음)
+            dispatch(clearAuth());
+            lastProcessedEmail = '';
           } finally {
             // 3초 후 플래그 해제 (다른 세션 허용)
             setTimeout(() => {
