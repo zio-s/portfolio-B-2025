@@ -306,7 +306,7 @@ const PostsPage = () => {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <Link to={ROUTES.BLOG_CREATE}>
-                  <Button size="default" className="shadow-md hover:shadow-lg transition-all group">
+                  <Button className="shadow-md hover:shadow-lg transition-all group">
                     <PenSquare className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
                     새 글 작성
                   </Button>

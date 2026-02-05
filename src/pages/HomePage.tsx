@@ -467,7 +467,7 @@ const HomePage = () => {
               </Link>
 
               <div className="space-y-1.5">
-                {postsData?.slice(0, 3).map((post) => {
+                {postsData?.posts?.slice(0, 3).map((post: any) => {
                   const postDate = new Date(post.publishedAt || post.createdAt);
                   const daysDiff = Math.floor((Date.now() - postDate.getTime()) / (1000 * 60 * 60 * 24));
                   const isNew = daysDiff >= 0 && daysDiff <= 3;
