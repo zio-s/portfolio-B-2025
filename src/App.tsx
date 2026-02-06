@@ -26,59 +26,38 @@ import { UserRole } from './services/types';
 function App() {
   const dispatch = useAppDispatch();
 
-  // 초기 인증 상태 확인 + Supabase Auth Listener
+  /**
+   * Supabase Auth 상태 변경 리스너
+   *
+   * 메모리 기반 세션:
+   * - INITIAL_SESSION: 새로고침 시 세션 없음 (보안 강화)
+   * - SIGNED_IN: 로그인 성공 시 Redux에 사용자 정보 저장
+   * - SIGNED_OUT: 로그아웃 시 Redux 초기화
+   */
   useEffect(() => {
-    let isProcessingAuth = false;
-    let lastProcessedEmail = '';
-
-    // Supabase Auth 상태 변경 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // INITIAL_SESSION과 SIGNED_IN은 같은 세션이므로 하나만 처리
-        if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session) {
-          // 이미 처리 중이거나, 같은 이메일로 처리했으면 스킵
-          if (isProcessingAuth || lastProcessedEmail === session.user.email) {
-            return;
-          }
+        console.log('[Auth Event]', event, session?.user?.email);
 
-          isProcessingAuth = true;
-          lastProcessedEmail = session.user.email ?? '';
-
+        if (event === 'SIGNED_IN' && session) {
+          // 로그인 성공: admin_users 검증 후 Redux 저장
           try {
-            // getCurrentUser thunk를 사용하여 admin_users에서 정보 가져오기
-            // 이 thunk는 authService.getSession()을 호출하여 admin_users 테이블에서 이름을 가져옴
             await dispatch(getCurrentUser()).unwrap();
-          } catch (err) {
-            // 실패 시 인증 상태 초기화 (보안: fallback으로 인증 허용하지 않음)
+            console.log('[Auth] 로그인 성공, Redux 상태 업데이트');
+          } catch {
+            // admin_users 검증 실패 시 로그아웃
             dispatch(clearAuth());
-            lastProcessedEmail = '';
-          } finally {
-            // 3초 후 플래그 해제 (다른 세션 허용)
-            setTimeout(() => {
-              isProcessingAuth = false;
-            }, 3000);
+            console.log('[Auth] admin_users 검증 실패');
           }
         } else if (event === 'SIGNED_OUT') {
-          // 중복 처리 방지
-          if (isProcessingAuth) {
-            return;
-          }
-
-          isProcessingAuth = true;
-
-          // Redux 상태만 초기화 (Supabase signOut 다시 호출하지 않음)
+          // 로그아웃: Redux 초기화
           dispatch(clearAuth());
-          lastProcessedEmail = '';
-
-          // 플래그 해제
-          setTimeout(() => {
-            isProcessingAuth = false;
-          }, 1000);
+          console.log('[Auth] 로그아웃, Redux 상태 초기화');
         }
+        // INITIAL_SESSION: 메모리 기반이므로 세션 없음 (무시)
       }
     );
 
-    // Cleanup: 컴포넌트 언마운트 시 구독 해제
     return () => {
       subscription.unsubscribe();
     };

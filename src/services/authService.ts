@@ -90,6 +90,10 @@ export const authService = {
 
   /**
    * 현재 세션 가져오기
+   *
+   * 메모리 기반 세션:
+   * - 새로고침 시 세션 없음 (정상 동작)
+   * - signOut 호출 제거 (순환 호출 방지)
    */
   async getSession(): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
@@ -112,7 +116,7 @@ export const authService = {
         .single();
 
       if (adminError || !adminUser) {
-        await supabase.auth.signOut();
+        // signOut 호출 제거 - 호출자에서 처리하도록 함 (순환 호출 방지)
         return { user: null, error: 'Not authorized' };
       }
 
